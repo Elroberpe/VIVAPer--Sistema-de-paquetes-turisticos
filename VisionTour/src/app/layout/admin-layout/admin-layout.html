@@ -1,0 +1,17 @@
+<div class="admin-shell" (keydown.escape)="cerrarMenu()">
+  <vp-skip-link destino="admin-contenido" texto="Saltar al contenido administrativo" />
+  @if (menuAbierto()) { <button class="sidebar-backdrop" type="button" aria-label="Cerrar menú administrativo" (click)="cerrarMenu()"></button> }
+  <aside #menuLateral class="admin-sidebar" id="admin-sidebar" [class.mobile-open]="menuAbierto()" aria-label="Navegación administrativa" (keydown.tab)="mantenerFoco($event)">
+    <div class="sidebar-brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="m4 31 12-23 9 16 5-9 7 16H4Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="31" cy="8" r="4" fill="#ff9c78"/></svg><span>Viva<span>Peru</span><small>ESPACIO DE GESTIÓN</small></span><button class="sidebar-close" type="button" aria-label="Cerrar navegación" (click)="cerrarMenu()"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div>
+    <div class="workspace-label"><span class="workspace-icon"><i class="bi bi-compass" aria-hidden="true"></i></span><div>VivaPeru<small>Panel administrativo</small></div><span class="workspace-dot"></span></div>
+    <span class="sidebar-section-label">GESTIÓN GENERAL</span>
+    <nav aria-label="Secciones del panel">@for (item of secciones; track item.id) { <a [routerLink]="['/admin', item.id]" routerLinkActive="selected" ariaCurrentWhenActive="page"><i class="bi" [class]="'bi ' + item.icono" aria-hidden="true"></i><span>{{ item.titulo }}</span><i class="bi bi-chevron-right nav-chevron" aria-hidden="true"></i></a> }</nav>
+    <div class="sidebar-bottom"><div class="sidebar-compass"><i class="bi bi-compass" aria-hidden="true"></i></div><p>Las grandes experiencias<br>empiezan por aquí.</p><span><span></span> ENTORNO DE PRUEBA</span></div>
+  </aside>
+  <div class="admin-workspace" [attr.inert]="menuAbierto() ? '' : null">
+    <header class="admin-topbar"><div class="topbar-left"><button #botonMenu class="sidebar-toggle" type="button" aria-label="Abrir menú administrativo" aria-controls="admin-sidebar" [attr.aria-expanded]="menuAbierto()" (click)="menuAbierto() ? cerrarMenu() : abrirMenu()"><i class="bi bi-list" aria-hidden="true"></i></button><span class="topbar-home"><i class="bi bi-house-door" aria-hidden="true"></i></span><span class="topbar-parent">Administración</span><i class="bi bi-chevron-right breadcrumb-arrow" aria-hidden="true"></i><span class="topbar-current">{{ titulo() }}</span></div><div class="topbar-right"><a routerLink="/" class="view-site">Ver sitio web <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a><span class="topbar-divider"></span><vp-menu-cuenta [saliendo]="saliendo()" (perfil)="perfilModal.abrir()" (salir)="salir()"><span class="profile-link"><span class="profile-avatar" aria-hidden="true">{{ iniciales() }}</span><span class="profile-copy"><strong>{{ auth.sesion()?.nombre }}</strong><small>{{ auth.sesion()?.rol }}</small></span><i class="bi bi-chevron-down profile-chevron" aria-hidden="true"></i></span></vp-menu-cuenta></div></header>
+    <vp-perfil-modal #perfilModal />
+    <main class="admin-main" id="admin-contenido" tabindex="-1"><router-outlet /></main>
+    <footer class="admin-footer"><span>VivaPeru · El Perú se vive.</span><span><i class="bi bi-info-circle" aria-hidden="true"></i> @if (seccion() === 'usuarios') { Usuarios · Gestión de cuentas } @else { Datos ficticios · Los cambios se restablecen al recargar }</span></footer>
+  </div>
+</div>

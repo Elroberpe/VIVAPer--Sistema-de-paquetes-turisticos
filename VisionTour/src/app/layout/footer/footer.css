@@ -1,0 +1,12 @@
+.site-footer { background: var(--color-brand); color: white; padding: 3.5rem 0 0; }
+.footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.1fr; gap: 2rem; padding-bottom: 3rem; }
+.footer-brand { font-size: 26px; font-weight: 800; color: white; text-decoration: none; letter-spacing: -.8px; }
+.footer-brand span { color: #ff9c78; } .footer-brand i { font-size: 22px; margin-left: .7rem; }
+.footer-top p { color: #c4d1de; line-height: 1.9; font-size: 13px; margin: 1rem 0 0; }
+.footer-top h2 { font-size: 13px; font-weight: 700; margin: .5rem 0 1.25rem; }
+.footer-top > div > a:not(.footer-brand), .footer-top button { display: block; color: #c4d1de; text-decoration: none; font-size: 12px; margin: .8rem 0; border: 0; padding: 0; background: none; }
+.footer-top a:hover, .footer-top button:hover { color: white; text-decoration: underline; }
+.footer-note { border-left: 1px solid #ffffff24; padding-left: 2rem; } .footer-note > i { color: #ff9c78; font-size: 23px; } .footer-note p { margin-top: .5rem; } .footer-note strong { color: white; font-weight: 600; }
+.demo-badge { display: inline-block; font-size: 10px; padding: 4px 8px; border: 1px solid #ffffff38; border-radius: 6px; color: #d2e4ff; margin-top: 1rem; }
+.footer-bottom { border-top: 1px solid #ffffff1f; padding-block: 1.3rem; display: flex; justify-content: space-between; gap: 1rem; font-size: 10px; color: #b2c1d1; }
+@media (width < 768px) { .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem 1rem; } .footer-top > div:first-child { grid-column: 1 / -1; } .footer-note { grid-column: 1 / -1; border-left: none; border-top: 1px solid #ffffff24; padding: 1rem 0 0; } .footer-bottom { flex-direction: column; } }

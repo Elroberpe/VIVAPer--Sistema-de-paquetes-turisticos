@@ -1,0 +1,25 @@
+<div class="login-layout">
+  <aside class="login-story" aria-label="VivaPeru, el Perú se vive">
+    <img class="story-image" src="/images/cusco.jpg" alt="Montañas y terrazas de Machu Picchu" width="1200" height="1600">
+    <div class="story-shade"></div>
+    <a class="login-brand" routerLink="/" aria-label="VivaPeru, volver al sitio"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="m4 31 12-23 9 16 5-9 7 16H4Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="31" cy="8" r="4" fill="#ff9c78"/></svg><span>Viva<span class="brand-orange">Peru</span><small>EL PERÚ SE VIVE</small></span></a>
+    <div class="story-copy"><span class="story-kicker">CADA GRAN VIAJE EMPIEZA CONTIGO</span>@if (accesoCliente) { <h1>Vuelve a conectar<br>con tu próxima <em>aventura.</em></h1><p>Un país por descubrir.<br>Tu próxima historia empieza aquí.</p> } @else { <h1>Detrás de cada viaje,<br>un gran <em>equipo.</em></h1><p>Conectamos personas con lugares increíbles.<br>Desde aquí, tú haces que todo sea posible.</p> }<span class="story-location"><i class="bi bi-geo-alt" aria-hidden="true"></i> Machu Picchu · Cusco, Perú</span></div>
+    <span class="story-footer">Un país. Mil historias por crear.</span>
+  </aside>
+  <main class="login-form-area" id="acceso">
+    <a class="back-to-site" routerLink="/"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al sitio</a>
+    <div class="login-card"><span class="access-tag"><i class="bi" [class.bi-compass]="accesoCliente" [class.bi-shield-lock]="!accesoCliente" aria-hidden="true"></i> {{ accesoCliente ? 'TU CUENTA VIVAPERU' : 'ACCESO ADMINISTRATIVO' }}</span><h2>Qué bueno verte<br>de nuevo.</h2><p class="login-description">{{ accesoCliente ? 'Inicia sesión y sigue descubriendo tu próxima experiencia en el Perú.' : 'Ingresa a tu espacio de trabajo y sigue creando experiencias que conectan.' }}</p>
+      @if (registroCreado) { <p class="auth-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i> Tu cuenta fue creada. Inicia sesión para continuar.</p> }
+      <form [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
+        <label class="form-label" for="login-correo">Correo electrónico</label><div class="login-input"><i class="bi bi-envelope" aria-hidden="true"></i><input id="login-correo" class="form-control" type="email" formControlName="correo" autocomplete="username" placeholder="Ingresa tu correo electrónico" [attr.aria-invalid]="form.controls.correo.touched && form.controls.correo.invalid" aria-describedby="error-correo"></div>
+        @if (form.controls.correo.touched && form.controls.correo.invalid) { <p class="field-error" id="error-correo">Ingresa un correo electrónico válido.</p> }
+        <label class="form-label password-label" for="login-clave">Contraseña</label><div class="login-input"><i class="bi bi-lock" aria-hidden="true"></i><input id="login-clave" class="form-control" [type]="visible() ? 'text' : 'password'" formControlName="clave" autocomplete="current-password" placeholder="Ingresa tu contraseña" [attr.aria-invalid]="form.controls.clave.touched && form.controls.clave.invalid" aria-describedby="error-clave"><button class="show-password" type="button" [attr.aria-label]="visible() ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="visible()" (click)="visible.set(!visible())"><i class="bi" [class.bi-eye]="!visible()" [class.bi-eye-slash]="visible()" aria-hidden="true"></i></button></div>
+        @if (form.controls.clave.touched && form.controls.clave.invalid) { <p class="field-error" id="error-clave">Ingresa tu contraseña.</p> }
+        @if (error()) { <div class="login-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ error() }}</div> }
+        <button class="btn btn-primary login-submit" type="submit" [disabled]="enviando() || restaurando()">@if (enviando() || restaurando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>{{ restaurando() ? 'Comprobando sesión…' : 'Ingresando…' }} } @else { {{ accesoCliente ? 'Iniciar sesión' : 'Ingresar al panel' }} <i class="bi bi-arrow-right" aria-hidden="true"></i> }</button>
+      </form>
+      @if (accesoCliente) { <p class="auth-switch">¿Todavía no tienes una cuenta? <a routerLink="/registrarse">Regístrate</a></p> } @else { <p class="login-footnote"><i class="bi bi-shield-check" aria-hidden="true"></i> Ingresa con tu cuenta de administrador o empleado. Los datos de gestión del panel siguen siendo de prueba.</p> }
+    </div>
+    <span class="login-copyright">VivaPeru · Hecho para descubrir el Perú.</span>
+  </main>
+</div>

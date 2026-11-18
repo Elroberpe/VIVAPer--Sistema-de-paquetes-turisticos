@@ -1,0 +1,184 @@
+/*
+ * Sistema visual de VivaPeru.
+ * Referencia completa: docs/sistema-diseno-referencia.md
+ * Las reglas visuales de componentes prevalecen sobre los valores divergentes
+ * del encabezado de la referencia. Decisiones: docs/diseno-frontend.md.
+ */
+:root {
+  /* Paleta original: se conserva para mantener trazabilidad. */
+  --vp-surface: #f7f9fb;
+  --vp-surface-dim: #d8dadc;
+  --vp-surface-bright: #f7f9fb;
+  --vp-surface-container-lowest: #ffffff;
+  --vp-surface-container-low: #f2f4f6;
+  --vp-surface-container: #eceef0;
+  --vp-surface-container-high: #e6e8ea;
+  --vp-surface-container-highest: #e0e3e5;
+  --vp-on-surface: #191c1e;
+  --vp-on-surface-variant: #43474d;
+  --vp-inverse-surface: #2d3133;
+  --vp-inverse-on-surface: #eff1f3;
+  --vp-outline: #74777e;
+  --vp-outline-variant: #c4c6ce;
+  --vp-surface-tint: #49607e;
+  --vp-primary: #000f22;
+  --vp-on-primary: #ffffff;
+  --vp-primary-container: #0a2540;
+  --vp-on-primary-container: #768dad;
+  --vp-inverse-primary: #b0c8eb;
+  --vp-secondary: #ab3500;
+  --vp-on-secondary: #ffffff;
+  --vp-secondary-container: #fe6a34;
+  --vp-on-secondary-container: #5d1900;
+  --vp-tertiary: #001209;
+  --vp-on-tertiary: #ffffff;
+  --vp-tertiary-container: #002a1a;
+  --vp-on-tertiary-container: #009e6d;
+  --vp-error: #ba1a1a;
+  --vp-on-error: #ffffff;
+  --vp-error-container: #ffdad6;
+  --vp-on-error-container: #93000a;
+  --vp-primary-fixed: #d2e4ff;
+  --vp-primary-fixed-dim: #b0c8eb;
+  --vp-on-primary-fixed: #001c37;
+  --vp-on-primary-fixed-variant: #314865;
+  --vp-secondary-fixed: #ffdbd0;
+  --vp-secondary-fixed-dim: #ffb59d;
+  --vp-on-secondary-fixed: #390c00;
+  --vp-on-secondary-fixed-variant: #832600;
+  --vp-tertiary-fixed: #6ffbbe;
+  --vp-tertiary-fixed-dim: #4edea3;
+  --vp-on-tertiary-fixed: #002113;
+  --vp-on-tertiary-fixed-variant: #005236;
+  --vp-background: #f7f9fb;
+  --vp-on-background: #191c1e;
+  --vp-surface-variant: #e0e3e5;
+
+  /* Roles de interfaz: valores descritos en Brand & Style y Components. */
+  --color-brand: #0a2540;
+  --color-action: #ff6b35;
+  --color-positive: #10b981;
+  --color-canvas: #f8fafc;
+  --color-card: #ffffff;
+  --color-subtle: #f1f5f9;
+  --color-text: var(--color-brand);
+  --color-text-muted: #627d98;
+  --color-on-brand: #ffffff;
+  --color-on-action: #ffffff;
+  --color-positive-surface: #ecfdf5;
+  --color-positive-text: #065f46;
+  --color-error: var(--vp-error);
+  --color-error-surface: var(--vp-error-container);
+  --color-on-error-surface: var(--vp-on-error-container);
+  --color-border-subtle: rgba(10, 37, 64, 0.08);
+  --color-border-card: rgba(10, 37, 64, 0.06);
+  --color-border-control: rgba(10, 37, 64, 0.12);
+  --color-focus-ring: rgba(10, 37, 64, 0.08);
+  --color-glass: rgba(255, 255, 255, 0.85);
+
+  /* Tipografía: tamaños y alturas de línea explícitos de la referencia. */
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --type-display-size: 56px;
+  --type-display-leading: 64px;
+  --type-display-weight: 800;
+  --type-display-tracking: -0.03em;
+  --type-headline-xl-size: 40px;
+  --type-headline-xl-leading: 48px;
+  --type-headline-xl-weight: 700;
+  --type-headline-xl-tracking: -0.025em;
+  --type-headline-lg-size: 32px;
+  --type-headline-lg-leading: 40px;
+  --type-headline-lg-weight: 700;
+  --type-headline-lg-tracking: -0.02em;
+  --type-headline-md-size: 24px;
+  --type-headline-md-leading: 32px;
+  --type-headline-md-weight: 600;
+  --type-headline-md-tracking: -0.015em;
+  --type-headline-sm-size: 20px;
+  --type-headline-sm-leading: 28px;
+  --type-headline-sm-weight: 600;
+  --type-headline-sm-tracking: -0.01em;
+  --type-title-size: 18px;
+  --type-title-leading: 26px;
+  --type-title-weight: 600;
+  --type-title-tracking: -0.005em;
+  --type-body-lg-size: 18px;
+  --type-body-lg-leading: 28px;
+  --type-body-size: 16px;
+  --type-body-leading: 24px;
+  --type-body-sm-size: 14px;
+  --type-body-sm-leading: 20px;
+  --type-body-weight: 400;
+  --type-label-size: 14px;
+  --type-label-leading: 20px;
+  --type-label-weight: 600;
+  --type-label-tracking: 0.01em;
+  --type-label-sm-size: 12px;
+  --type-label-sm-leading: 16px;
+  --type-label-sm-weight: 600;
+  --type-label-sm-tracking: 0.03em;
+  --type-caption-size: 11px;
+  --type-caption-leading: 14px;
+  --type-caption-weight: 500;
+  --type-caption-tracking: 0.04em;
+
+  /* Escala de radios original y asignaciones explícitas por componente. */
+  --radius-sm: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --radius-hero: 1.5rem;
+  --radius-checkbox: 6px;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --layout-max-width: 1280px;
+  --layout-margin: 3rem;
+  --layout-gutter: 1.5rem;
+  --card-padding: var(--space-lg);
+  --control-height: 48px;
+  --checkbox-size: 20px;
+
+  --shadow-card: 0 4px 20px -2px rgba(10, 37, 64, 0.05),
+    0 2px 6px -1px rgba(10, 37, 64, 0.03);
+  --shadow-hover: 0 12px 32px -4px rgba(10, 37, 64, 0.08),
+    0 4px 12px -2px rgba(10, 37, 64, 0.04);
+  --shadow-floating: 0 20px 48px -6px rgba(10, 37, 64, 0.12),
+    0 8px 20px -4px rgba(10, 37, 64, 0.06);
+  --shadow-action-hover: 0 8px 20px -4px rgba(255, 107, 53, 0.35);
+  --glass-blur: 12px;
+  --card-hover-offset: -4px;
+  --control-active-scale: 0.98;
+}
+
+@media (width < 1200px) {
+  :root {
+    --layout-margin: 2rem;
+    --layout-gutter: 1.25rem;
+  }
+}
+
+@media (width < 768px) {
+  :root {
+    --layout-margin: 1.25rem;
+    --layout-gutter: 1rem;
+    --card-padding: var(--space-md);
+    --type-display-size: 36px;
+    --type-display-leading: 44px;
+    --type-display-tracking: -0.02em;
+    --type-headline-xl-size: 28px;
+    --type-headline-xl-leading: 36px;
+    --type-headline-xl-tracking: -0.02em;
+    --type-headline-lg-size: 24px;
+    --type-headline-lg-leading: 32px;
+    --type-headline-lg-tracking: -0.015em;
+  }
+}

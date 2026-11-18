@@ -1,0 +1,8 @@
+.search-dock { display: grid; grid-template-columns: 1.1fr 1fr .9fr auto; align-items: center; gap: .5rem; background: var(--color-card); border-radius: var(--radius-hero); padding: 1.1rem; box-shadow: var(--shadow-hover); border: 1px solid var(--color-border-subtle); text-align: left; }
+.search-field { display: flex; align-items: center; gap: .8rem; padding: .25rem 1rem; border-right: 1px solid var(--color-border-subtle); min-width: 0; }
+.search-field > i { font-size: 21px; color: var(--color-brand); } .search-field > div { flex: 1; min-width: 0; }
+.search-field label { display: block; font-size: 11px; font-weight: 800; margin-bottom: 5px; color: var(--color-brand); }
+.search-field select, .search-field input { width: 100%; border: none; background: transparent; color: #52667b; font-family: inherit; font-size: 12px; min-height: 28px; padding: 0; border-radius: 3px; }
+.travelers-field { border-right: 0; } .search-submit { min-height: 54px; font-size: 12px; padding-inline: 1.3rem; white-space: nowrap; }
+@media (width < 1000px) { .search-dock { grid-template-columns: 1fr 1fr 1fr; } .search-submit { grid-column: 1 / -1; } }
+@media (width < 768px) { .search-dock { grid-template-columns: 1fr 1fr; padding: 1rem; gap: 1rem .3rem; } .search-field { padding: .3rem .4rem; gap: .5rem; } .search-field:first-child { grid-column: 1 / -1; border-right: none; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 1rem; } .search-field > i { font-size: 18px; } .search-field input, .search-field select { font-size: 12px; } .search-field label { font-size: 10px; } }

@@ -1,0 +1,83 @@
+<dialog #modal class="record-dialog" aria-labelledby="editar-usuario-titulo" (cancel)="cerrar($event)">
+  <header class="dialog-header">
+    <div><span class="management-eyebrow">GESTIÓN DE USUARIOS</span><h2 id="editar-usuario-titulo">Editar usuario</h2></div>
+    <button class="dialog-close" type="button" aria-label="Cerrar edición de usuario" autofocus [disabled]="guardando()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+
+  <div class="edit-tabs" role="tablist" aria-label="Secciones de edición de usuario" (keydown)="navegarPestanas($event)">
+    <button id="editar-tab-datos" type="button" role="tab" aria-controls="editar-panel-datos" [attr.aria-selected]="seccion() === 'datos'" [attr.tabindex]="seccion() === 'datos' ? 0 : -1" [disabled]="guardando()" (click)="cambiarSeccion('datos')"><i class="bi bi-person-lines-fill" aria-hidden="true"></i> Datos</button>
+    <button id="editar-tab-rol" type="button" role="tab" aria-controls="editar-panel-rol" [attr.aria-selected]="seccion() === 'rol'" [attr.tabindex]="seccion() === 'rol' ? 0 : -1" [disabled]="guardando()" (click)="cambiarSeccion('rol')"><i class="bi bi-shield-check" aria-hidden="true"></i> Rol</button>
+  </div>
+
+  <div class="dialog-body">
+    @if (mensaje()) { <div class="save-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}</div> }
+    @if (error()) { <div class="form-save-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ error() }}</div> }
+    @if (usuario(); as actual) {
+      @if (seccion() === 'datos') {
+        <div id="editar-panel-datos" role="tabpanel" aria-labelledby="editar-tab-datos">
+          <form id="editar-datos-form" [formGroup]="datosForm" (ngSubmit)="guardarDatos()" novalidate [attr.aria-busy]="guardando()">
+            <fieldset [disabled]="guardando()">
+              <legend class="visually-hidden">Editar datos del usuario</legend>
+              <div class="editor-fields">
+                <div>
+                  <label class="form-label" for="editar-nombre">Nombre</label>
+                  <input class="form-control" id="editar-nombre" formControlName="nombre" autocomplete="given-name" maxlength="100" [attr.aria-invalid]="datosForm.controls.nombre.touched && datosForm.controls.nombre.invalid" aria-describedby="editar-nombre-error">
+                  @if (datosForm.controls.nombre.touched && datosForm.controls.nombre.invalid) { <p class="field-error" id="editar-nombre-error">Ingresa un nombre válido.</p> }
+                </div>
+                <div>
+                  <label class="form-label" for="editar-apellido">Apellido</label>
+                  <input class="form-control" id="editar-apellido" formControlName="apellido" autocomplete="family-name" maxlength="100" [attr.aria-invalid]="datosForm.controls.apellido.touched && datosForm.controls.apellido.invalid" aria-describedby="editar-apellido-error">
+                  @if (datosForm.controls.apellido.touched && datosForm.controls.apellido.invalid) { <p class="field-error" id="editar-apellido-error">Ingresa un apellido válido.</p> }
+                </div>
+                <div>
+                  <label class="form-label" for="editar-usuario">Usuario</label>
+                  <input class="form-control" id="editar-usuario" formControlName="usuario" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" [attr.aria-invalid]="datosForm.controls.usuario.touched && datosForm.controls.usuario.invalid" aria-describedby="editar-usuario-error">
+                  @if (datosForm.controls.usuario.touched && datosForm.controls.usuario.invalid) { <p class="field-error" id="editar-usuario-error">Usa de 3 a 30 letras, números, puntos, guiones o guiones bajos.</p> }
+                </div>
+                <div>
+                  <label class="form-label" for="editar-celular">Teléfono</label>
+                  <input class="form-control" id="editar-celular" type="tel" formControlName="celular" autocomplete="tel" maxlength="16" [attr.aria-invalid]="datosForm.controls.celular.touched && datosForm.controls.celular.invalid" aria-describedby="editar-celular-error">
+                  @if (datosForm.controls.celular.touched && datosForm.controls.celular.invalid) { <p class="field-error" id="editar-celular-error">Ingresa de 9 a 15 dígitos, con + opcional.</p> }
+                </div>
+                <div>
+                  <label class="form-label" for="editar-correo">Correo</label>
+                  <input class="form-control" id="editar-correo" type="email" [value]="actual.correo" readonly>
+                </div>
+                <div>
+                  <label class="form-label" for="editar-rol-actual">Rol</label>
+                  <input class="form-control" id="editar-rol-actual" [value]="roles[actual.rol]" readonly>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      } @else {
+        <div id="editar-panel-rol" role="tabpanel" aria-labelledby="editar-tab-rol">
+          <form id="editar-rol-form" [formGroup]="rolForm" (ngSubmit)="guardarRol()" novalidate [attr.aria-busy]="guardando()">
+            <fieldset [disabled]="guardando()">
+              <legend class="visually-hidden">Cambiar rol del usuario</legend>
+              <label class="form-label" for="editar-rol">Rol</label>
+              <select class="form-select" id="editar-rol" formControlName="rol" [attr.aria-invalid]="rolForm.controls.rol.touched && rolForm.controls.rol.invalid" aria-describedby="editar-rol-ayuda">
+                <option value="ADMIN">Administrador</option>
+                <option value="CLIENTE" [disabled]="esMiCuenta()">Cliente</option>
+                <option value="EMPLEADO" [disabled]="esMiCuenta()">Empleado</option>
+              </select>
+              <div id="editar-rol-ayuda">
+                @if (rolForm.controls.rol.touched && rolForm.controls.rol.invalid) { <p class="field-error">Selecciona un rol válido.</p> }
+                @else if (esMiCuenta()) { <small class="field-help">No puedes quitarte el rol de administrador.</small> }
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      }
+    }
+  </div>
+
+  <footer class="dialog-footer edit-footer">
+    <button class="btn btn-outline-brand" type="button" [disabled]="guardando()" (click)="cerrar()">Cerrar</button>
+    <button class="btn btn-primary" type="submit" [attr.form]="'editar-' + seccion() + '-form'" [disabled]="guardando() || !usuario() || (seccion() === 'datos' ? !datosForm.dirty : !rolForm.dirty || rolForm.controls.rol.value === usuario()?.rol)">
+      @if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… }
+      @else { <i class="bi bi-check2" aria-hidden="true"></i>{{ seccion() === 'datos' ? 'Actualizar datos' : 'Actualizar rol' }} }
+    </button>
+  </footer>
+</dialog>

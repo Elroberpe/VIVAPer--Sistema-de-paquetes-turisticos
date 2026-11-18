@@ -1,0 +1,29 @@
+import { Destino, Paquete, Salida } from './models';
+
+export const DESTINOS: Destino[] = [
+  { id: 'cusco', nombre: 'Cusco', region: 'Historia entre montañas', imagen: '/images/cusco.jpg', descripcion: 'Caminos incas, pueblos del Valle Sagrado y paisajes que se quedan contigo.' },
+  { id: 'ica', nombre: 'Ica', region: 'Donde el desierto sorprende', imagen: '/images/ica.jpg', descripcion: 'Dunas doradas, un oasis inesperado y la inmensidad del Pacífico.' },
+  { id: 'arequipa', nombre: 'Arequipa', region: 'La belleza del sur', imagen: '/images/arequipa.jpg', descripcion: 'Sillar, sabores y cañones para descubrir el sur a tu propio ritmo.' },
+  { id: 'loreto', nombre: 'Amazonía', region: 'Naturaleza que conecta', imagen: '/images/amazonia.jpg', descripcion: 'Ríos que reflejan el cielo y senderos bajo el verde de la selva.' }
+];
+
+function salidas(id: string, precio: number): Salida[] {
+  return [21, 28, 42].map((dias, index) => {
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() + dias);
+    const iso = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+    return { id: `${id}-${index}`, fecha: iso, cupos: index === 1 ? 0 : 8, precioCentimos: precio + (index === 2 ? 5000 : 0) };
+  });
+}
+
+export function crearPaquetes(): Paquete[] {
+  const base: Omit<Paquete, 'salidas'>[] = [
+    { id: 'p1', slug: 'cusco-y-machu-picchu', titulo: 'Cusco y la magia de Machu Picchu', destinoId: 'cusco', destino: 'Cusco', categoria: 'Cultura', dias: 4, precioDesdeCentimos: 129000, imagen: '/images/cusco.jpg', destacado: 'Una experiencia inolvidable', descripcion: 'Déjate llevar por las calles de Cusco, recorre el Valle Sagrado y encuentra ese momento de asombro frente a Machu Picchu.', incluidos: ['Alojamiento de prueba', 'Guía local', 'Traslados del itinerario'], itinerario: [{ titulo: 'Bienvenido a Cusco', descripcion: 'Llegada, tiempo para aclimatarte y un paseo tranquilo por la ciudad.' }, { titulo: 'El Valle Sagrado', descripcion: 'Una ruta entre pueblos, paisajes andinos y tradiciones.' }, { titulo: 'El encuentro con Machu Picchu', descripcion: 'Visita guiada y tiempo para disfrutar el paisaje.' }, { titulo: 'Hasta la próxima aventura', descripcion: 'Mañana libre y traslado de salida.' }] },
+    { id: 'p2', slug: 'huacachina-y-paracas', titulo: 'Entre dunas y mar en Ica', destinoId: 'ica', destino: 'Ica y Paracas', categoria: 'Aventura', dias: 2, precioDesdeCentimos: 38900, imagen: '/images/ica.jpg', destacado: 'Para tu próxima escapada', descripcion: 'Cambia de paisaje: una aventura entre las dunas de Huacachina y la brisa de la costa de Paracas.', incluidos: ['Alojamiento de prueba', 'Actividades del itinerario', 'Transporte local'], itinerario: [{ titulo: 'Un oasis entre dunas', descripcion: 'Recorrido por Huacachina y una tarde de aventura en el desierto.' }, { titulo: 'La costa de Paracas', descripcion: 'Exploración de la costa y regreso por la tarde.' }] },
+    { id: 'p3', slug: 'arequipa-y-colca', titulo: 'Arequipa y los paisajes del Colca', destinoId: 'arequipa', destino: 'Arequipa', categoria: 'Naturaleza', dias: 3, precioDesdeCentimos: 74900, imagen: '/images/arequipa.jpg', destacado: 'El sur te espera', descripcion: 'Descubre la arquitectura de la Ciudad Blanca y los grandes paisajes del valle del Colca en una escapada para mirar despacio.', incluidos: ['Alojamiento de prueba', 'Guía local', 'Traslados del itinerario'], itinerario: [{ titulo: 'La Ciudad Blanca', descripcion: 'Paseo por las calles y plazas del centro de Arequipa.' }, { titulo: 'Rumbo al valle del Colca', descripcion: 'Un recorrido entre miradores y pueblos del valle.' }, { titulo: 'Una mañana en las alturas', descripcion: 'Contemplación del paisaje y regreso a Arequipa.' }] },
+    { id: 'p4', slug: 'amazonas-a-tu-ritmo', titulo: 'Una pausa en el corazón del Amazonas', destinoId: 'loreto', destino: 'Loreto', categoria: 'Naturaleza', dias: 4, precioDesdeCentimos: 119000, imagen: '/images/amazonia.jpg', destacado: 'Conecta con lo esencial', descripcion: 'Navega entre reflejos, escucha el bosque y descubre una forma distinta de vivir el tiempo en la Amazonía peruana.', incluidos: ['Lodge de prueba', 'Guía local', 'Paseos del itinerario'], itinerario: [{ titulo: 'El río nos recibe', descripcion: 'Llegada y navegación hacia el alojamiento.' }, { titulo: 'Senderos del bosque', descripcion: 'Caminata interpretativa con un guía local.' }, { titulo: 'La vida junto al río', descripcion: 'Paseo en bote y tiempo de descanso.' }, { titulo: 'Un último amanecer', descripcion: 'Desayuno y navegación de regreso.' }] },
+    { id: 'p5', slug: 'valle-sagrado', titulo: 'El Valle Sagrado, sin prisa', destinoId: 'cusco', destino: 'Cusco', categoria: 'Aventura', dias: 2, precioDesdeCentimos: 45900, imagen: '/images/cusco.jpg', destacado: 'Caminos por descubrir', descripcion: 'Una escapada corta para caminar entre paisajes andinos y volver con historias nuevas.', incluidos: ['Alojamiento de prueba', 'Guía local', 'Traslados'], itinerario: [{ titulo: 'Pueblos del valle', descripcion: 'Exploración de los pueblos y sus alrededores.' }, { titulo: 'Una ruta entre montañas', descripcion: 'Caminata de prueba y regreso a Cusco.' }] },
+    { id: 'p6', slug: 'escapada-huacachina', titulo: 'Un atardecer en Huacachina', destinoId: 'ica', destino: 'Ica', categoria: 'Aventura', dias: 1, precioDesdeCentimos: 15900, imagen: '/images/ica.jpg', destacado: 'Un día fuera de la rutina', descripcion: 'Escápate un día al oasis y disfruta cómo cambia la luz sobre las dunas.', incluidos: ['Guía local', 'Actividad de prueba', 'Transporte local'], itinerario: [{ titulo: 'El desierto a tu manera', descripcion: 'Llegada al oasis, paseo por las dunas y regreso al finalizar la tarde.' }] }
+  ];
+  return base.map(paquete => ({ ...paquete, salidas: salidas(paquete.id, paquete.precioDesdeCentimos) }));
+}

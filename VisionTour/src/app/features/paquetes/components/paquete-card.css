@@ -1,0 +1,19 @@
+:host { display: block; height: 100%; }
+.package-card { border: 1px solid var(--color-border-card); border-radius: var(--radius-card); overflow: hidden; background: var(--color-card); box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease; height: 100%; display: flex; flex-direction: column; }
+.package-card:hover { transform: translateY(var(--card-hover-offset)); box-shadow: var(--shadow-hover); }
+.package-image { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--color-subtle); }
+.package-image > a { display: block; width: 100%; height: 100%; } .package-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.package-card:hover img { transform: scale(1.04); }
+.category-badge { position: absolute; left: 1rem; top: 1rem; padding: .4rem .7rem; border-radius: var(--radius-full); background: #ffffffed; font-size: 10px; font-weight: 700; pointer-events: none; }
+.favorite-button { position: absolute; top: .8rem; right: .8rem; width: 40px; height: 40px; background: #ffffffed; border: 0; border-radius: 50%; color: var(--color-brand); font-size: 17px; display: grid; place-items: center; }
+.favorite-button[aria-pressed='true'] { color: #b63c16; }
+.image-duration { position: absolute; left: 1rem; bottom: .8rem; display: flex; align-items: center; gap: .35rem; font-size: 10px; font-weight: 600; background: #0a2540d9; color: white; border-radius: var(--radius-full); padding: .35rem .65rem; }
+.package-body { padding: var(--card-padding); flex: 1; display: flex; flex-direction: column; }
+.package-location { font-size: 10px; color: #62748a; display: flex; gap: .3rem; align-items: center; margin-bottom: .7rem; }
+h3 { font-size: 18px; line-height: 1.5; font-weight: 700; letter-spacing: -.45px; margin-bottom: .45rem; } h3 a { color: var(--color-brand); text-decoration: none; } h3 a:hover { text-decoration: underline; }
+p { font-size: 11px; color: #607185; line-height: 1.7; margin-bottom: .9rem; }
+.package-includes { display: flex; gap: 1rem; color: #607185; font-size: 10px; margin-bottom: 1.1rem; } .package-includes i { margin-right: .25rem; }
+.package-bottom { border-top: 1px solid var(--color-border-subtle); padding-top: 1rem; margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.package-bottom small { display: block; font-size: 9px; color: #62748a; margin-bottom: .2rem; } .package-bottom strong { font-size: 23px; font-weight: 800; letter-spacing: -.7px; font-variant-numeric: tabular-nums; } .package-bottom span { font-size: 10px; color: #62748a; margin-left: .35rem; }
+.card-arrow { width: 40px; height: 40px; display: grid; place-items: center; background: #fff0e9; color: #9f3513; border-radius: .75rem; text-decoration: none; font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { .package-card, .package-image img { transition: none; } .package-card:hover, .package-card:hover img { transform: none; } }

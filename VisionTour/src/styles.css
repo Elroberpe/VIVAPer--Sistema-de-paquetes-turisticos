@@ -1,0 +1,8 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import 'sweetalert2/dist/sweetalert2.min.css';
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/bootstrap-theme.css';
+@import './styles/sweetalert-theme.css';

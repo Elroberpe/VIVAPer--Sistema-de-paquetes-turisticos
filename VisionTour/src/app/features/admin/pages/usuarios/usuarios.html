@@ -1,0 +1,87 @@
+<section aria-labelledby="gestion-titulo">
+  <div class="management-heading">
+    <div><span class="management-eyebrow">EQUIPO Y ACCESOS</span><h1 id="gestion-titulo">Usuarios</h1><p>Consulta las cuentas de VivaPeru y administra su acceso.</p></div>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary create-button" type="button" (click)="crearUsuario.abrir()"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo usuario</button>
+      <button class="btn btn-outline-brand" type="button" [disabled]="fuente().cargando" (click)="recargar()"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar</button>
+    </div>
+  </div>
+  @if (mensaje()) { <div class="save-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}<button type="button" aria-label="Cerrar aviso" (click)="mensaje.set('')"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div> }
+  @if (errorAccion()) { <div class="users-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ errorAccion() }}</div> }
+
+  <div class="records-card" [attr.aria-busy]="fuente().cargando">
+    <div class="records-heading"><div><h2>Listado de usuarios @if (!fuente().cargando && !fuente().error) { <span>{{ fuente().datos.totalElements }}</span> }</h2><p>Consulta los datos y el estado de cada cuenta.</p></div></div>
+    <div class="records-toolbar">
+      <div class="status-tabs" aria-label="Filtrar por estado">
+        <button type="button" [class.active]="estado() === undefined" [attr.aria-pressed]="estado() === undefined" (click)="filtrarEstado('')">Todos</button>
+        <button type="button" [class.active]="estado() === true" [attr.aria-pressed]="estado() === true" (click)="filtrarEstado('Activo')">Activos</button>
+        <button type="button" [class.active]="estado() === false" [attr.aria-pressed]="estado() === false" (click)="filtrarEstado('Inactivo')">Inactivos</button>
+      </div>
+      <div class="search-and-filters">
+        <label class="table-search"><span class="visually-hidden">Buscar por nombre, apellido o correo</span><i class="bi bi-search" aria-hidden="true"></i><input type="search" maxlength="100" placeholder="Buscar por nombre o correo…" [formControl]="busqueda"></label>
+        <button class="filter-button" type="button" (click)="limpiar()">Limpiar</button>
+      </div>
+    </div>
+
+    @if (fuente().cargando) {
+      <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando usuarios…</div>
+    } @else if (fuente().error) {
+      <div class="empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h2>No pudimos cargar los usuarios.</h2><p>{{ fuente().error }}</p><button class="btn btn-outline-brand" type="button" (click)="recargar()">Volver a intentar</button></div>
+    } @else if (!fuente().datos.content.length) {
+      <div class="empty-state"><i class="bi bi-search" aria-hidden="true"></i><h2>No encontramos usuarios.</h2><p>Prueba otro nombre o limpia los filtros.</p><button class="btn btn-outline-brand" type="button" (click)="limpiar()">Limpiar filtros</button></div>
+    } @else {
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Tabla de usuarios">
+        <table class="management-table"><thead><tr><th scope="col">Usuario</th><th scope="col">Correo</th><th scope="col">Teléfono</th><th scope="col">Rol</th><th scope="col">Estado</th><th scope="col" class="actions-heading">Acciones</th></tr></thead>
+          <tbody>@for (usuario of fuente().datos.content; track usuario.id) {
+            <tr>
+              <td><div class="record-primary"><span class="record-avatar" aria-hidden="true">{{ iniciales(usuario) }}</span><div><strong>{{ nombre(usuario) }} @if (esMiCuenta(usuario)) { <span class="you-label">Tú</span> }</strong><small>{{ usuario.usuario }}</small></div></div></td>
+              <td><span class="secondary-cell">{{ usuario.correo }}</span></td>
+              <td><span class="secondary-cell">{{ usuario.celular }}</span></td>
+              <td><span class="role-tag" [class.administrator]="usuario.rol === 'ADMIN'">{{ roles[usuario.rol] }}</span></td>
+              <td><span class="state-tag" [class.is-active]="usuario.activo"><span></span>{{ usuario.activo ? 'Activo' : 'Inactivo' }}</span></td>
+              <td><div class="row-actions">
+                <button class="detail-action" type="button" [attr.aria-label]="'Ver usuario: ' + nombre(usuario)" (click)="abrirDetalle(usuario)"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                <button class="edit-action" type="button" [attr.aria-label]="'Editar usuario: ' + nombre(usuario)" title="Editar usuario" (click)="editarUsuario.abrir(usuario)"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                <button class="state-action" type="button" [attr.aria-label]="(usuario.activo ? 'Desactivar' : 'Activar') + ' usuario: ' + nombre(usuario)" [title]="esMiCuenta(usuario) && usuario.activo ? 'No puedes desactivar tu propia cuenta' : ''" [disabled]="cambiando() !== null || (esMiCuenta(usuario) && usuario.activo)" (click)="cambiarEstado(usuario)">
+                  @if (cambiando() === usuario.id) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> } @else { <i class="bi" [class.bi-toggle-on]="usuario.activo" [class.bi-toggle-off]="!usuario.activo" aria-hidden="true"></i> }
+                  {{ usuario.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div></td>
+            </tr>
+          }</tbody>
+        </table>
+      </div>
+    }
+
+    @if (!fuente().cargando && !fuente().error) {
+      <div class="table-footer"><span role="status">Mostrando <strong>{{ inicio() }}–{{ fin() }}</strong> de <strong>{{ fuente().datos.totalElements }}</strong> usuarios</span>
+        <nav class="pagination-controls" aria-label="Paginación de usuarios">
+          <button type="button" aria-label="Página anterior" [disabled]="fuente().datos.page <= 0" (click)="irPagina(fuente().datos.page - 1)"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+          <span aria-current="page">{{ fuente().datos.page + 1 }}</span><span class="page-total">de {{ fuente().datos.totalPages || 1 }}</span>
+          <button type="button" aria-label="Página siguiente" [disabled]="fuente().datos.page + 1 >= fuente().datos.totalPages" (click)="irPagina(fuente().datos.page + 1)"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+        </nav>
+      </div>
+    }
+  </div>
+</section>
+
+<vp-editar-usuario-modal #editarUsuario (actualizado)="usuarioActualizado($event)" />
+<vp-crear-usuario-modal #crearUsuario (creado)="usuarioCreado()" />
+
+<dialog #detalleModal class="record-dialog" aria-labelledby="detalle-titulo" (cancel)="cerrarDetalle($event)">
+  <header class="dialog-header"><div><span class="management-eyebrow">INFORMACIÓN DE LA CUENTA</span><h2 id="detalle-titulo">Detalle de usuario</h2></div><button class="dialog-close" type="button" aria-label="Cerrar detalle" autofocus (click)="cerrarDetalle()"><i class="bi bi-x-lg" aria-hidden="true"></i></button></header>
+  <div class="dialog-body" [attr.aria-busy]="cargandoDetalle()">
+    @if (cargandoDetalle()) { <div class="detail-loading" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando detalle…</div> }
+    @else if (errorDetalle()) { <div class="users-error" role="alert">{{ errorDetalle() }}</div> }
+    @else if (detalle(); as usuario) {
+      <dl class="user-details">
+        <div><dt>Nombres</dt><dd>{{ usuario.nombre }}</dd></div><div><dt>Apellidos</dt><dd>{{ usuario.apellido }}</dd></div>
+        <div><dt>Usuario</dt><dd>{{ usuario.usuario }}</dd></div><div><dt>Teléfono</dt><dd>{{ usuario.celular }}</dd></div>
+        <div class="field-wide"><dt>Correo</dt><dd>{{ usuario.correo }}</dd></div>
+        <div><dt>Rol</dt><dd>{{ roles[usuario.rol] }}</dd></div><div><dt>Estado</dt><dd>{{ usuario.activo ? 'Activo' : 'Inactivo' }}</dd></div>
+        <div class="field-wide"><dt>Fecha de registro</dt><dd>{{ usuario.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</dd></div>
+      </dl>
+    }
+  </div>
+  <footer class="dialog-footer"><button class="btn btn-outline-brand" type="button" (click)="cerrarDetalle()">Cerrar</button></footer>
+</dialog>

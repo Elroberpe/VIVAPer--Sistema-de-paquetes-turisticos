@@ -1,0 +1,32 @@
+.profile-modal { width: min(600px, calc(100vw - 32px)); max-height: 90dvh; padding: 0; border: 1px solid var(--color-border-control); border-radius: 18px; background: var(--color-card); color: var(--color-brand); box-shadow: var(--shadow-floating); }
+.profile-modal::backdrop { background: #041a32a8; backdrop-filter: blur(3px); }
+.modal-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 27px 10px; }
+.profile-eyebrow { color: #8b6149; font-size: 10px; font-weight: 700; letter-spacing: 1.7px; }
+.account-tabs { display: flex; gap: 24px; padding-inline: 27px; border-bottom: 1px solid var(--color-border-subtle); }
+.account-tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 2px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--color-text-muted); font-size: 13px; font-weight: 600; }
+.account-tabs button[aria-selected="true"] { border-bottom-color: var(--color-action); color: var(--color-brand); }
+.account-tabs button:hover { color: var(--color-brand); }
+.account-tabs button:disabled { opacity: .6; }
+.modal-close { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border: 0; border-radius: 9px; background: var(--color-subtle); color: var(--color-text-muted); }
+.modal-body { padding: 22px 27px; }
+.profile-summary { display: flex; align-items: center; gap: 16px; padding: 18px; margin-bottom: 24px; background: var(--color-subtle); border-radius: var(--radius-control); }
+.profile-summary > div { min-width: 0; }
+.account-avatar { display: grid; place-items: center; width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; background: #fce8db; color: #8d3b1b; font-size: 28px; }
+h3 { font-size: 15px; line-height: 1.6; margin: 0 0 4px; overflow-wrap: anywhere; }
+.account-role { font-size: 11px; font-weight: 600; }
+fieldset { min-width: 0; }
+.profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.profile-fields > div { min-width: 0; }
+.field-wide { grid-column: 1 / -1; }
+.form-control[readonly] { background: var(--color-subtle); color: var(--color-text-muted); }
+.modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding: 17px 27px; border-top: 1px solid var(--color-border-subtle); background: #fbfcfd; }
+.profile-success, .profile-error, .profile-state { display: flex; align-items: center; gap: 10px; border-radius: 10px; padding: 12px 15px; margin-bottom: 20px; font-size: 12px; line-height: 1.8; }
+.profile-success { background: var(--color-positive-surface); color: var(--color-positive-text); }
+.profile-error { background: var(--color-error-surface); color: var(--color-on-error-surface); }
+.profile-state { color: var(--color-text-muted); background: var(--color-subtle); }
+.field-error { color: var(--color-error); font-size: 11px; line-height: 1.7; margin: 8px 0 0; }
+.password-title, .section-title { font-size: 17px; margin-bottom: 22px; }
+.password-fields, .account-fields { display: grid; gap: 18px; }
+.password-help { display: block; color: var(--color-text-muted); font-size: 11px; line-height: 1.7; margin-top: 8px; }
+@media (width < 600px) { .modal-heading { padding: 18px 20px 8px; } .account-tabs { padding-inline: 20px; gap: 20px; } .modal-body { padding: 20px; } .modal-actions { padding: 17px 20px; } .profile-fields { grid-template-columns: 1fr; gap: 17px; } .profile-summary { padding: 15px; gap: 12px; } }
+@media (width < 400px) { .account-tabs { gap: 16px; } .account-tabs button { font-size: 12px; } .account-tabs i { display: none; } }

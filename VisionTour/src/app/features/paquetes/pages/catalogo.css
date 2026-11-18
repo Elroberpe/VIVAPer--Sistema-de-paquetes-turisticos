@@ -1,0 +1,12 @@
+.catalog-page { padding-block: 2rem 4rem; }
+.catalog-search { margin: 2rem 0 2.5rem; }
+.catalog-layout { display: grid; grid-template-columns: 245px 1fr; gap: 2rem; align-items: start; }
+.filters { border: 1px solid var(--color-border-subtle); border-radius: var(--radius-card); padding: 1.3rem; background: white; }
+.filters-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; } .filters-heading h2 { font-size: 13px; font-weight: 700; margin: 0; } .filters-heading button { border: 0; background: none; text-decoration: underline; font-size: 10px; color: #52667b; padding: .4rem 0; }
+.filter-field { margin-bottom: 1.3rem; } .filter-field .form-label { font-size: 11px; } .filter-field .form-select { font-size: 11px; min-height: 44px; padding-left: .7rem; }
+.favorites-filter { font-size: 11px; display: flex; align-items: center; gap: .6rem; cursor: pointer; } .favorites-filter input { margin: 0; width: 18px; height: 18px; }
+.filter-note { text-align: center; padding: 1.4rem .5rem 0; margin-top: 1.5rem; border-top: 1px solid var(--color-border-subtle); color: #62748a; } .filter-note i { font-size: 28px; } .filter-note p { font-size: 10px; margin: .6rem 0 0; line-height: 1.8; }
+.results-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 38px; margin-bottom: 1rem; } .results-toolbar > span { font-size: 11px; color: #52667b; } .results-toolbar > div { display: flex; align-items: center; gap: .6rem; } .results-toolbar label { font-size: 10px; color: #62748a; } .results-toolbar select { background: transparent; border: 0; color: var(--color-brand); font-size: 11px; font-weight: 600; padding: .5rem; max-width: 145px; }
+.catalog-demo { display: flex; align-items: baseline; gap: .4rem; color: #62748a; font-size: 10px; line-height: 1.8; margin: 1.5rem 0 0; }
+@media (width < 1000px) { .catalog-layout { grid-template-columns: 210px 1fr; gap: 1.25rem; } .catalog-results .col-md-6 { width: 100%; } }
+@media (width < 768px) { .catalog-layout { grid-template-columns: 1fr; } .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; } .filters-heading { grid-column: 1 / -1; margin: 0; } .filter-field { margin: 0; min-width: 0; } .favorites-filter { grid-column: 1 / -1; } .filter-note { display: none; } .results-toolbar { flex-wrap: wrap; } .catalog-search { margin-block: 1.5rem; } .catalog-page { padding-top: 1.5rem; } }

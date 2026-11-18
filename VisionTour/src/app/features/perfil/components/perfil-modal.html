@@ -1,0 +1,116 @@
+<dialog #modal class="profile-modal" aria-labelledby="perfil-titulo" (cancel)="cerrar($event)">
+  <header class="modal-heading">
+    <div><span class="profile-eyebrow">MI CUENTA</span><h2 id="perfil-titulo" class="visually-hidden">Mi cuenta</h2></div>
+    <button class="modal-close" type="button" aria-label="Cerrar perfil" autofocus [disabled]="guardando()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+  <div class="account-tabs" role="tablist" aria-label="Secciones de mi cuenta" (keydown)="navegarPestanas($event)">
+    @for (pestana of pestanas; track pestana.id) {
+      <button [id]="'tab-' + pestana.id" type="button" role="tab" [attr.aria-controls]="'panel-' + pestana.id" [attr.aria-selected]="seccion() === pestana.id" [attr.tabindex]="seccion() === pestana.id ? 0 : -1" [disabled]="guardando() || cargando()" (click)="cambiarSeccion(pestana.id)"><i [class]="'bi ' + pestana.icono" aria-hidden="true"></i>{{ pestana.titulo }}</button>
+    }
+  </div>
+  <div class="modal-body">
+    @if (mensaje()) { <div class="profile-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}</div> }
+    @if (error()) { <div class="profile-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ error() }}</div> }
+    @if (seccion() === 'perfil') {
+      <div id="panel-perfil" role="tabpanel" aria-labelledby="tab-perfil" [attr.aria-busy]="cargando()">
+        @if (cargando()) {
+          <div class="profile-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando tu perfil…</div>
+        } @else {
+          @if (perfil(); as usuario) {
+            <div class="profile-summary" aria-label="Información de tu cuenta">
+              <span class="account-avatar" aria-hidden="true"><i class="bi bi-person"></i></span>
+              <div><h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3><span class="account-role">{{ auth.sesion()?.rol }}</span></div>
+            </div>
+            <form id="perfil-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+              <fieldset [disabled]="guardando()">
+                <legend class="visually-hidden">Editar datos personales</legend>
+                <div class="profile-fields">
+                  <div>
+                    <label class="form-label" for="perfil-nombre">Nombres</label>
+                    <input class="form-control" id="perfil-nombre" formControlName="nombre" autocomplete="given-name" maxlength="100" [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid" aria-describedby="perfil-nombre-error">
+                    @if (form.controls.nombre.touched && form.controls.nombre.invalid) { <p class="field-error" id="perfil-nombre-error">Ingresa tus nombres (máximo 100 caracteres).</p> }
+                  </div>
+                  <div>
+                    <label class="form-label" for="perfil-apellido">Apellidos</label>
+                    <input class="form-control" id="perfil-apellido" formControlName="apellido" autocomplete="family-name" maxlength="100" [attr.aria-invalid]="form.controls.apellido.touched && form.controls.apellido.invalid" aria-describedby="perfil-apellido-error">
+                    @if (form.controls.apellido.touched && form.controls.apellido.invalid) { <p class="field-error" id="perfil-apellido-error">Ingresa tus apellidos (máximo 100 caracteres).</p> }
+                  </div>
+                  <div>
+                    <label class="form-label" for="perfil-usuario">Usuario</label>
+                    <input class="form-control" id="perfil-usuario" formControlName="usuario" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" [attr.aria-invalid]="form.controls.usuario.touched && form.controls.usuario.invalid" aria-describedby="perfil-usuario-error">
+                    @if (form.controls.usuario.touched && form.controls.usuario.invalid) { <p class="field-error" id="perfil-usuario-error">Usa de 3 a 30 letras, números, puntos, guiones o guiones bajos.</p> }
+                  </div>
+                  <div>
+                    <label class="form-label" for="perfil-celular">Teléfono</label>
+                    <input class="form-control" id="perfil-celular" type="tel" formControlName="celular" autocomplete="tel" maxlength="16" [attr.aria-invalid]="form.controls.celular.touched && form.controls.celular.invalid" aria-describedby="perfil-celular-error">
+                    @if (form.controls.celular.touched && form.controls.celular.invalid) { <p class="field-error" id="perfil-celular-error">Ingresa de 9 a 15 dígitos, con + opcional.</p> }
+                  </div>
+                  <div class="field-wide">
+                    <label class="form-label" for="perfil-email">Correo</label>
+                    <input class="form-control" id="perfil-email" type="email" [value]="usuario.email" readonly>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          } @else {
+            <button class="btn btn-outline-brand" type="button" (click)="cargar()"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Volver a intentar</button>
+          }
+        }
+      </div>
+    } @else if (seccion() === 'password') {
+      <div id="panel-password" role="tabpanel" aria-labelledby="tab-password">
+        <h3 class="password-title">Actualizar contraseña</h3>
+        <form id="password-form" [formGroup]="passwordForm" (ngSubmit)="actualizarPassword()" novalidate [attr.aria-busy]="guardando()">
+          <fieldset class="password-fields" [disabled]="guardando()">
+            <legend class="visually-hidden">Cambiar contraseña</legend>
+            <div>
+              <label class="form-label" for="password-actual">Contraseña actual</label>
+              <input class="form-control" id="password-actual" type="password" formControlName="passwordActual" autocomplete="current-password" [attr.aria-invalid]="passwordForm.controls.passwordActual.touched && passwordForm.controls.passwordActual.invalid" aria-describedby="password-actual-error">
+              @if (passwordForm.controls.passwordActual.touched && passwordForm.controls.passwordActual.invalid) { <p class="field-error" id="password-actual-error">Ingresa tu contraseña actual.</p> }
+            </div>
+            <div>
+              <label class="form-label" for="password-nueva">Nueva contraseña</label>
+              <input class="form-control" id="password-nueva" type="password" formControlName="passwordNueva" autocomplete="new-password" [attr.aria-invalid]="passwordForm.controls.passwordNueva.touched && passwordForm.controls.passwordNueva.invalid" aria-describedby="password-ayuda password-nueva-error">
+              <small class="password-help" id="password-ayuda">Mínimo 8 caracteres.</small>
+              @if (passwordForm.controls.passwordNueva.touched && passwordForm.controls.passwordNueva.invalid) { <p class="field-error" id="password-nueva-error">{{ passwordForm.controls.passwordNueva.hasError('claveLarga') ? 'La contraseña es demasiado larga. Usa una más corta.' : 'Ingresa una contraseña de al menos 8 caracteres.' }}</p> }
+            </div>
+            <div>
+              <label class="form-label" for="password-confirmacion">Confirmar nueva contraseña</label>
+              <input class="form-control" id="password-confirmacion" type="password" formControlName="confirmacion" autocomplete="new-password" [attr.aria-invalid]="passwordForm.controls.confirmacion.touched && (passwordForm.controls.confirmacion.invalid || passwordForm.hasError('clavesDistintas'))" aria-describedby="password-confirmacion-error">
+              @if (passwordForm.controls.confirmacion.touched && (passwordForm.controls.confirmacion.invalid || passwordForm.hasError('clavesDistintas'))) { <p class="field-error" id="password-confirmacion-error">Las contraseñas deben coincidir.</p> }
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    } @else {
+      <div id="panel-correo" role="tabpanel" aria-labelledby="tab-correo">
+        <h3 class="section-title">Actualizar correo</h3>
+        <form id="correo-form" [formGroup]="correoForm" (ngSubmit)="actualizarCorreo()" novalidate [attr.aria-busy]="guardando()">
+          <fieldset class="account-fields" [disabled]="guardando()">
+            <legend class="visually-hidden">Cambiar correo</legend>
+            <div>
+              <label class="form-label" for="correo-actual">Correo actual</label>
+              <input class="form-control" id="correo-actual" type="email" [value]="perfil()?.email ?? auth.sesion()?.correo ?? ''" readonly>
+            </div>
+            <div>
+              <label class="form-label" for="correo-nuevo">Nuevo correo</label>
+              <input class="form-control" id="correo-nuevo" type="email" formControlName="email" autocomplete="email" maxlength="150" [attr.aria-invalid]="correoForm.controls.email.touched && correoForm.controls.email.invalid" aria-describedby="correo-nuevo-error">
+              @if (correoForm.controls.email.touched && correoForm.controls.email.invalid) { <p class="field-error" id="correo-nuevo-error">Ingresa un correo válido.</p> }
+            </div>
+            <div>
+              <label class="form-label" for="correo-password">Contraseña actual</label>
+              <input class="form-control" id="correo-password" type="password" formControlName="passwordActual" autocomplete="current-password" [attr.aria-invalid]="correoForm.controls.passwordActual.touched && correoForm.controls.passwordActual.invalid" aria-describedby="correo-password-error">
+              @if (correoForm.controls.passwordActual.touched && correoForm.controls.passwordActual.invalid) { <p class="field-error" id="correo-password-error">Ingresa tu contraseña actual.</p> }
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    }
+  </div>
+  <footer class="modal-actions">
+    <button class="btn btn-outline-brand" type="button" [disabled]="guardando()" (click)="cerrar()">Cerrar</button>
+    @if (seccion() !== 'perfil' || (perfil() && !cargando())) {
+      <button class="btn btn-primary" type="submit" [attr.form]="seccion() + '-form'" [disabled]="guardando() || !formActivo().dirty">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { <i class="bi bi-check2" aria-hidden="true"></i>{{ pestanaActiva().accion }} }</button>
+    }
+  </footer>
+</dialog>

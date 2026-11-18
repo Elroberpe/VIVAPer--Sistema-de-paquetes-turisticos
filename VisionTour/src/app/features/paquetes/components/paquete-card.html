@@ -1,0 +1,15 @@
+<article class="package-card">
+  <div class="package-image">
+    <a [routerLink]="['/paquetes', paquete().slug]" [queryParams]="contexto()" tabindex="-1" aria-hidden="true"><img [src]="paquete().imagen" [alt]="''" loading="lazy" width="600" height="400"></a>
+    <span class="category-badge">{{ paquete().categoria }}</span>
+    <button type="button" class="favorite-button" [attr.aria-label]="(favoritos.ids().includes(paquete().id) ? 'Quitar de favoritos: ' : 'Guardar en favoritos: ') + paquete().titulo" [attr.aria-pressed]="favoritos.ids().includes(paquete().id)" (click)="favoritos.alternar(paquete().id)"><i class="bi" [class.bi-heart]="!favoritos.ids().includes(paquete().id)" [class.bi-heart-fill]="favoritos.ids().includes(paquete().id)" aria-hidden="true"></i></button>
+    <span class="image-duration"><i class="bi bi-clock" aria-hidden="true"></i> {{ paquete().dias }} {{ paquete().dias === 1 ? 'día' : 'días' }}</span>
+  </div>
+  <div class="package-body">
+    <span class="package-location"><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ paquete().destino }}, Perú</span>
+    <h3><a [routerLink]="['/paquetes', paquete().slug]" [queryParams]="contexto()">{{ paquete().titulo }}</a></h3>
+    <p>{{ paquete().destacado }}</p>
+    <div class="package-includes"><span><i class="bi bi-person-check" aria-hidden="true"></i> Guía local</span><span><i class="bi bi-map" aria-hidden="true"></i> Itinerario</span></div>
+    <div class="package-bottom"><div><small>Desde</small><strong>{{ paquete().precioDesdeCentimos / 100 | currency:'PEN':'symbol':'1.0-0' }}</strong><span>/ persona</span></div><a class="card-arrow" [routerLink]="['/paquetes', paquete().slug]" [queryParams]="contexto()" [attr.aria-label]="'Ver experiencia: ' + paquete().titulo"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
+  </div>
+</article>

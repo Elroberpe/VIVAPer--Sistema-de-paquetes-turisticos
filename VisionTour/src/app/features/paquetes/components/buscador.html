@@ -1,0 +1,8 @@
+<form class="search-dock" [formGroup]="form" (ngSubmit)="buscar()" aria-label="Buscar experiencias">
+  <div class="search-field"><i class="bi bi-geo-alt" aria-hidden="true"></i><div><label for="buscar-destino">¿A dónde vamos?</label><select id="buscar-destino" formControlName="destino"><option value="">Explora todo el Perú</option>@for (destino of destinos(); track destino.id) { <option [value]="destino.id">{{ destino.nombre }}</option> }</select></div></div>
+  <div class="search-field"><i class="bi bi-calendar4-week" aria-hidden="true"></i><div><label for="buscar-fecha">¿Cuándo viajamos?</label><input id="buscar-fecha" type="date" formControlName="fecha" [min]="hoy" aria-describedby="ayuda-fecha"></div></div>
+  <div class="search-field travelers-field"><i class="bi bi-people" aria-hidden="true"></i><div><label for="buscar-viajeros">¿Quiénes se suman?</label><select id="buscar-viajeros" formControlName="viajeros">@for (n of [1,2,3,4,5,6,7,8]; track n) { <option [ngValue]="n">{{ n }} {{ n === 1 ? 'viajero' : 'viajeros' }}</option> }</select></div></div>
+  <button class="btn btn-primary search-submit" type="submit"><i class="bi bi-search" aria-hidden="true"></i> Buscar experiencias</button>
+  <span id="ayuda-fecha" class="visually-hidden">La fecha es opcional. Las salidas disponibles son de prueba.</span>
+</form>
+@if (form.controls.fecha.touched && form.controls.fecha.value && form.controls.fecha.value < hoy) { <p class="field-error" role="alert">Elige una fecha de hoy en adelante.</p> }

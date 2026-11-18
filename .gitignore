@@ -1,0 +1,26 @@
+# Dependencias y archivos generados
+node_modules/
+target/
+dist/
+.angular/
+out-tsc/
+coverage/
+.sites-runtime/
+
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+application-local.properties
+*.pem
+*.key
+*.p12
+*.jks
+
+# IDE, sistema operativo y logs
+.idea/
+.vscode/
+*.iml
+*.log
+.DS_Store
+Thumbs.db

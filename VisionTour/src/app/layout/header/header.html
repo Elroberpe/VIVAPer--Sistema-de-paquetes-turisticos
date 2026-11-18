@@ -1,0 +1,27 @@
+<header class="site-header" (keydown.escape)="abierto.set(false)">
+  <div class="page-container header-inner">
+    <a class="brand" routerLink="/" aria-label="VivaPeru, inicio">
+      <span class="brand-symbol"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="m4 31 12-23 9 16 5-9 7 16H4Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="31" cy="8" r="4" fill="#ff6b35"/></svg></span>
+      <span>Viva<span class="brand-accent">Peru</span><small>EL PERÚ SE VIVE</small></span>
+    </a>
+    <button class="menu-toggle" type="button" aria-controls="navegacion" [attr.aria-expanded]="abierto()" [attr.aria-label]="abierto() ? 'Cerrar menú' : 'Abrir menú'" (click)="abierto.set(!abierto())"><i class="bi" [class.bi-x-lg]="abierto()" [class.bi-list]="!abierto()" aria-hidden="true"></i></button>
+    <nav id="navegacion" [class.is-open]="abierto()" aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Inicio</a>
+      <a routerLink="/destinos" routerLinkActive="active" ariaCurrentWhenActive="page">Destinos</a>
+      <a routerLink="/paquetes" routerLinkActive="active" ariaCurrentWhenActive="page">Experiencias</a>
+      <a routerLink="/" fragment="como-funciona">Cómo funciona</a>
+      <a class="btn btn-brand header-cta" routerLink="/paquetes">Encuentra tu viaje <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+      <div class="customer-actions" role="group" aria-label="Acceso de clientes">
+        @if (auth.sesion(); as sesion) {
+          <vp-menu-cuenta class="align-start" [saliendo]="saliendo()" (perfil)="perfilModal.abrir()" (salir)="salir()">
+            <span class="customer-name"><i class="bi bi-person-circle" aria-hidden="true"></i><span>Hola, {{ sesion.nombre.split(' ')[0] }}</span><i class="bi bi-chevron-down" aria-hidden="true"></i></span>
+          </vp-menu-cuenta>
+        } @else {
+          <a class="btn customer-login" routerLink="/iniciar-sesion">Iniciar sesión</a>
+          <a class="btn customer-register" routerLink="/registrarse">Registrarse</a>
+        }
+      </div>
+    </nav>
+  </div>
+</header>
+<vp-perfil-modal #perfilModal />

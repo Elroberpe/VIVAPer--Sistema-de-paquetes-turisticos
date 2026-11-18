@@ -1,0 +1,10 @@
+.registration-card { max-width: 430px; padding-block: 30px; }
+.registration-card h2 { margin-top: 20px; }
+.registration-card .login-description { margin-bottom: 24px; }
+.name-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.name-fields > div { min-width: 0; }
+.account-fields { margin-top: 19px; }
+.name-fields .form-control { height: 51px; background: #fbfcfd; font-size: 13px; }
+.register-label { margin-top: 19px; }
+.password-help { display: block; font-size: 11px; color: #62748a; margin-top: 7px; }
+@media (width < 400px) { .name-fields { grid-template-columns: 1fr; gap: 18px; } }

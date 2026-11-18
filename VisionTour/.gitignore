@@ -1,0 +1,9 @@
+/node_modules
+/dist
+/.angular
+/out-tsc
+/coverage
+/.sites-runtime
+*.log
+.env
+.env.*

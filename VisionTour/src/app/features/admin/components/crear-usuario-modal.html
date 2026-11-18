@@ -1,0 +1,61 @@
+<dialog #modal class="record-dialog" aria-labelledby="crear-usuario-titulo" (cancel)="cerrar($event)">
+  <header class="dialog-header">
+    <div><span class="management-eyebrow">GESTIÓN DE USUARIOS</span><h2 id="crear-usuario-titulo">Nuevo usuario</h2></div>
+    <button class="dialog-close" type="button" aria-label="Cerrar creación de usuario" autofocus [disabled]="guardando()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="crear()" autocomplete="off" novalidate [attr.aria-busy]="guardando()">
+    <div class="dialog-body">
+      <fieldset [disabled]="guardando()">
+        <legend class="visually-hidden">Datos del nuevo usuario</legend>
+        <div class="editor-fields">
+          <div>
+            <label class="form-label" for="nuevo-nombre">Nombre</label>
+            <input class="form-control" id="nuevo-nombre" formControlName="nombre" maxlength="100" [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid" aria-describedby="nuevo-nombre-error">
+            @if (form.controls.nombre.touched && form.controls.nombre.invalid) { <p class="field-error" id="nuevo-nombre-error">Ingresa un nombre válido.</p> }
+          </div>
+          <div>
+            <label class="form-label" for="nuevo-apellido">Apellido</label>
+            <input class="form-control" id="nuevo-apellido" formControlName="apellido" maxlength="100" [attr.aria-invalid]="form.controls.apellido.touched && form.controls.apellido.invalid" aria-describedby="nuevo-apellido-error">
+            @if (form.controls.apellido.touched && form.controls.apellido.invalid) { <p class="field-error" id="nuevo-apellido-error">Ingresa un apellido válido.</p> }
+          </div>
+          <div>
+            <label class="form-label" for="nuevo-usuario">Usuario</label>
+            <input class="form-control" id="nuevo-usuario" formControlName="usuario" autocapitalize="none" spellcheck="false" maxlength="30" [attr.aria-invalid]="form.controls.usuario.touched && form.controls.usuario.invalid" aria-describedby="nuevo-usuario-error">
+            @if (form.controls.usuario.touched && form.controls.usuario.invalid) { <p class="field-error" id="nuevo-usuario-error">Usa de 3 a 30 letras, números, puntos, guiones o guiones bajos.</p> }
+          </div>
+          <div>
+            <label class="form-label" for="nuevo-celular">Teléfono</label>
+            <input class="form-control" id="nuevo-celular" type="tel" formControlName="celular" maxlength="16" [attr.aria-invalid]="form.controls.celular.touched && form.controls.celular.invalid" aria-describedby="nuevo-celular-error">
+            @if (form.controls.celular.touched && form.controls.celular.invalid) { <p class="field-error" id="nuevo-celular-error">Ingresa de 9 a 15 dígitos, con + opcional.</p> }
+          </div>
+          <div>
+            <label class="form-label" for="nuevo-correo">Correo</label>
+            <input class="form-control" id="nuevo-correo" type="email" formControlName="correo" maxlength="150" [attr.aria-invalid]="form.controls.correo.touched && form.controls.correo.invalid" aria-describedby="nuevo-correo-error">
+            @if (form.controls.correo.touched && form.controls.correo.invalid) { <p class="field-error" id="nuevo-correo-error">Ingresa un correo válido.</p> }
+          </div>
+          <div>
+            <label class="form-label" for="nuevo-rol">Rol</label>
+            <select class="form-select" id="nuevo-rol" formControlName="rol" [attr.aria-invalid]="form.controls.rol.touched && form.controls.rol.invalid" aria-describedby="nuevo-rol-error">
+              <option value="ADMIN">Administrador</option>
+              <option value="CLIENTE">Cliente</option>
+              <option value="EMPLEADO">Empleado</option>
+            </select>
+            @if (form.controls.rol.touched && form.controls.rol.invalid) { <p class="field-error" id="nuevo-rol-error">Selecciona un rol válido.</p> }
+          </div>
+          <div class="field-wide">
+            <label class="form-label" for="nuevo-password">Contraseña inicial</label>
+            <input class="form-control" id="nuevo-password" type="password" formControlName="password" autocomplete="new-password" [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid" aria-describedby="nuevo-password-ayuda nuevo-password-error">
+            <small class="field-help" id="nuevo-password-ayuda">Mínimo 8 caracteres.</small>
+            @if (form.controls.password.touched && form.controls.password.invalid) { <p class="field-error" id="nuevo-password-error">{{ form.controls.password.hasError('claveLarga') ? 'La contraseña es demasiado larga.' : 'Ingresa una contraseña válida de al menos 8 caracteres.' }}</p> }
+          </div>
+        </div>
+      </fieldset>
+      @if (error()) { <div class="form-save-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>{{ error() }}</div> }
+    </div>
+    <footer class="dialog-footer">
+      <button class="btn btn-outline-brand" type="button" [disabled]="guardando()" (click)="cerrar()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="guardando()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Creando… } @else { <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear usuario }</button>
+    </footer>
+  </form>
+</dialog>

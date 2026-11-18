@@ -1,0 +1,28 @@
+<div class="page-container home-top">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-image" src="/images/cusco.jpg" alt="Terrazas de Machu Picchu rodeadas por las montañas de los Andes" width="1600" height="800" fetchpriority="high">
+    <div class="hero-shade"></div>
+    <div class="hero-content"><span class="hero-eyebrow"><span></span> GRANDES HISTORIAS, CERCA DE TI</span><h1 id="hero-title">Hay un Perú<br>que te espera.<span>Sal a descubrirlo.</span></h1><p>De los Andes al Amazonas, encuentra experiencias<br class="desktop-break"> que se convierten en tus mejores recuerdos.</p><a routerLink="/paquetes" class="hero-link">Encuentra tu próxima aventura <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
+    <div class="hero-location"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Machu Picchu<small>Cusco, Perú</small></span></div>
+    <span class="hero-index">01 <span>/ 04 destinos</span></span>
+  </section>
+  <div class="hero-search"><vp-buscador /></div>
+  <div class="intro-benefits"><span><i class="bi bi-map" aria-hidden="true"></i> Itinerarios para inspirarte</span><span><i class="bi bi-heart" aria-hidden="true"></i> Viajes a tu manera</span><span><i class="bi bi-compass" aria-hidden="true"></i> Un país, mil formas de vivirlo</span><span class="preview-label"><span></span> Exploración de prueba</span></div>
+</div>
+
+<section class="page-container section-space" aria-labelledby="destinos-title">
+  <div class="section-heading"><div><span class="eyebrow">ELIGE DÓNDE EMPIEZA TU HISTORIA</span><h2 id="destinos-title">Un destino para cada emoción.</h2><p>Montañas, desiertos, ciudades y selva. ¿Por dónde empezamos?</p></div><a class="text-link" routerLink="/destinos">Ver destinos <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+  <div class="destination-grid">@for (destino of destinos(); track destino.id) { <a class="destination-card" routerLink="/paquetes" [queryParams]="{ destino: destino.id }"><img [src]="destino.imagen" [alt]="'Paisaje de ' + destino.nombre" width="500" height="400" loading="lazy"><div class="destination-shade"></div><div class="destination-copy"><span>{{ destino.region }}</span><h3>{{ destino.nombre }}</h3></div><span class="destination-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a> }</div>
+</section>
+
+<section class="experiences-section" aria-labelledby="experiencias-title"><div class="page-container">
+  <div class="section-heading"><div><span class="eyebrow">MENOS RUTINA, MÁS RECUERDOS</span><h2 id="experiencias-title">Tu próximo «tenías que estar ahí».</h2><p>Escapadas y grandes viajes para volver con algo que contar.</p></div><a class="text-link" routerLink="/paquetes">Ver experiencias <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
+  <div class="experience-toolbar"><div class="category-tabs" aria-label="Filtrar experiencias por categoría">@for (item of categorias; track item) { <button type="button" [class.selected]="categoria() === item" [attr.aria-pressed]="categoria() === item" (click)="categoria.set(item)">{{ item || 'Todas las experiencias' }}</button> }</div><span class="sample-note"><i class="bi bi-info-circle" aria-hidden="true"></i> Precios y paquetes de prueba</span></div>
+  <div class="row g-4" aria-live="polite">@if (!paquetes()) { <div class="col-12 loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Preparando nuevas historias…</div> } @else { @for (paquete of destacados(); track paquete.id) { <div class="col-md-6 col-xl-4"><vp-paquete-card [paquete]="paquete" /></div> } }</div>
+</div></section>
+
+<section class="page-container section-space" id="como-funciona" aria-labelledby="como-title">
+  <div class="how-layout"><div class="how-intro"><span class="eyebrow">EL VIAJE EMPIEZA AQUÍ</span><h2 id="como-title">Menos vueltas.<br>Más mundo.</h2><p>Tu próxima experiencia, paso a paso.<br>Así de sencillo se siente empezar.</p><a class="text-link" routerLink="/paquetes">Vamos a explorar <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div><div class="how-steps"><article><span class="step-number">01</span><div><h3>Encuentra tu lugar</h3><p>Explora destinos y elige una experiencia que conecte contigo.</p></div><i class="bi bi-compass" aria-hidden="true"></i></article><article><span class="step-number">02</span><div><h3>Dale forma a tu viaje</h3><p>Revisa el itinerario y consulta las salidas y los precios de prueba.</p></div><i class="bi bi-calendar2-check" aria-hidden="true"></i></article><article><span class="step-number">03</span><div><h3>Imagina lo que viene</h3><p>Guarda tus favoritos. La reserva y el pago simulados llegarán en la siguiente etapa.</p></div><i class="bi bi-suitcase2" aria-hidden="true"></i></article></div></div>
+</section>
+
+<section class="page-container inspiration-wrap"><div class="inspiration"><div><span class="eyebrow">A VECES SOLO HACE FALTA EMPEZAR</span><h2>Tu próxima historia<br>no está en una pantalla.</h2><p>Está en ese lugar que todavía no conoces.</p><a class="btn btn-primary" routerLink="/paquetes">Quiero descubrir Perú <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div><div class="inspiration-art" aria-hidden="true"><i class="bi bi-compass"></i><span>PERÚ<br><small>UN VIAJE, MIL HISTORIAS</small></span></div></div></section>

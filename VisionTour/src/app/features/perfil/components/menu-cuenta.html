@@ -1,0 +1,7 @@
+<details #menu (keydown.escape)="cerrarConEscape($event)" (focusout)="cerrarAlSalir($event)">
+  <summary #boton aria-label="Menú de mi cuenta" title="Mi cuenta"><ng-content /></summary>
+  <div class="account-dropdown">
+    <button class="account-profile" type="button" [disabled]="saliendo()" (click)="abrirPerfil()"><i class="bi bi-person" aria-hidden="true"></i> Mi perfil</button>
+    <button class="account-logout" type="button" [disabled]="saliendo()" (click)="salir.emit()"><i class="bi bi-box-arrow-right" aria-hidden="true"></i>{{ saliendo() ? 'Saliendo…' : 'Cerrar sesión' }}</button>
+  </div>
+</details>

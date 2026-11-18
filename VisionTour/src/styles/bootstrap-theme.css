@@ -1,0 +1,35 @@
+:root {
+  --bs-font-sans-serif: var(--font-family);
+  --bs-body-font-family: var(--font-family);
+  --bs-body-color: var(--color-text);
+  --bs-body-bg: var(--color-canvas);
+  --bs-primary: var(--color-brand);
+  --bs-primary-rgb: 10, 37, 64;
+  --bs-border-color: var(--color-border-control);
+  --bs-border-radius: var(--radius-control);
+  --bs-link-color: var(--color-brand);
+}
+.row { --bs-gutter-x: var(--layout-gutter); }
+.btn { --bs-btn-border-radius: var(--radius-control); font-size: 12px; font-weight: 700; min-height: 44px; padding: .8rem 1.2rem; display: inline-flex; align-items: center; justify-content: center; gap: .65rem; transition: background-color .2s ease, box-shadow .2s ease; }
+.btn-primary {
+  --bs-btn-bg: var(--color-action-readable);
+  --bs-btn-border-color: var(--color-action-readable);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #a93612;
+  --bs-btn-hover-border-color: #a93612;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #922d0e;
+  --bs-btn-active-border-color: #922d0e;
+  --bs-btn-disabled-bg: #946655;
+  --bs-btn-disabled-border-color: #946655;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-focus-shadow-rgb: 190, 64, 24;
+}
+.btn-primary:hover { box-shadow: var(--shadow-action-hover); }
+.btn-brand { --bs-btn-bg: var(--color-brand); --bs-btn-border-color: var(--color-brand); --bs-btn-color: #fff; --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #193e60; --bs-btn-hover-border-color: #193e60; --bs-btn-active-bg: #001c37; --bs-btn-active-color: #fff; }
+.btn-outline-brand { --bs-btn-color: var(--color-brand); --bs-btn-border-color: #b9c4cf; --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--color-brand); --bs-btn-hover-border-color: var(--color-brand); }
+.form-control, .form-select { min-height: var(--control-height); background-color: white; color: var(--color-brand); border: 1.5px solid var(--color-border-control); border-radius: var(--radius-control); font-size: 13px; }
+.form-control:focus, .form-select:focus { border-color: var(--color-brand); box-shadow: 0 0 0 .25rem var(--color-focus-ring); }
+.form-label { color: var(--color-brand); font-size: 12px; font-weight: 700; margin-bottom: .5rem; }
+.form-check-input:checked { background-color: var(--color-brand); border-color: var(--color-brand); }

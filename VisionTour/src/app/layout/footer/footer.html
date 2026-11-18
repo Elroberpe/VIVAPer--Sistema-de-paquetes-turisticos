@@ -1,0 +1,11 @@
+<footer class="site-footer">
+  <div class="page-container">
+    <div class="footer-top">
+      <div><a class="footer-brand" routerLink="/">Viva<span>Peru</span><i class="bi bi-compass" aria-hidden="true"></i></a><p>Historias que empiezan con un viaje.<br>Descubre el Perú, a tu manera.</p></div>
+      <div><h2>Descubre</h2><a routerLink="/destinos">Destinos del Perú</a><a routerLink="/paquetes">Todas las experiencias</a><a routerLink="/paquetes" [queryParams]="{ categoria: 'Aventura' }">Viajes de aventura</a></div>
+      <div><h2>Tu próximo viaje</h2><a routerLink="/" fragment="como-funciona">Cómo funciona</a><a routerLink="/paquetes" [queryParams]="{ favoritos: '1' }">Mis favoritos</a><a routerLink="/admin/login">Acceso administrativo</a><button type="button" (click)="acerca()">Acerca del prototipo</button></div>
+      <div class="footer-note"><i class="bi bi-geo-alt" aria-hidden="true"></i><p>Hecho para descubrir<br><strong>cada rincón del Perú.</strong></p><span class="demo-badge">Versión de prueba</span></div>
+    </div>
+    <div class="footer-bottom"><span>© {{ year }} VivaPeru. El Perú se vive.</span><span>Contenido y precios ilustrativos · Sin cobros reales</span></div>
+  </div>
+</footer>

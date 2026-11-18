@@ -1,0 +1,4 @@
+.swal2-popup.vp-alert { font-family: var(--font-family); border-radius: var(--radius-hero); color: var(--color-brand); box-shadow: var(--shadow-floating); padding: 2rem; }
+.vp-alert .swal2-title { font-size: 23px; line-height: 1.4; letter-spacing: -.5px; }
+.vp-alert .swal2-html-container { font-size: 14px; line-height: 1.8; }
+.vp-alert .swal2-actions { gap: .75rem; }
