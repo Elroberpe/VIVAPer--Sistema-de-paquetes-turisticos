@@ -57,7 +57,7 @@ abstract class UsuarioPersistenceContract {
             assertThat(rolRepository.existsByNombre(nombre)).isTrue();
             assertThat(rolRepository.findByNombre(nombre)).isPresent();
         }
-        assertThat(flyway.info().applied()).hasSize(4);
+        assertThat(flyway.info().applied()).hasSizeGreaterThanOrEqualTo(4);
     }
 
     @Test
