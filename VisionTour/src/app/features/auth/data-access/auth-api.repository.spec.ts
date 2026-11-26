@@ -139,4 +139,41 @@ describe('Autenticación HTTP según el contrato del backend', () => {
     await completarPost('login', respuesta('jwt-cliente', 'CLIENTE'));
     expect((await clienteLogin).rol).toBe('Cliente'); expect(auth.esPersonal()).toBe(false);
   });
+
+  it('consulta destinos públicos sin sesión y sin solicitar renovación', async () => {
+    const listado = firstValueFrom(cliente.get('/api/public/destinos'));
+    const request = http.expectOne('/api/public/destinos');
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    request.flush([]);
+    expect(await listado).toEqual([]);
+    http.expectNone('/api/auth/refresh');
+    http.expectNone('/api/auth/csrf');
+  });
+
+  it('omite JWT incluso si existe sesión o se proporciona manualmente en una consulta pública', async () => {
+    await ingresar('jwt-existente');
+    for (const ruta of ['/api/public/destinos?consulta=prueba', '/api/public/destinos/7']) {
+      const consulta = firstValueFrom(cliente.get(ruta, { headers: { Authorization: 'Bearer jwt-manual' } }));
+      const request = http.expectOne(ruta);
+      expect(request.request.headers.has('Authorization')).toBe(false);
+      request.flush({});
+      await consulta;
+    }
+    const privada = firstValueFrom(cliente.get('/api/admin/destinos'));
+    const request = http.expectOne('/api/admin/destinos');
+    expect(request.request.headers.get('Authorization')).toBe('Bearer jwt-existente');
+    request.flush([]); await privada;
+  });
+
+  it('no renueva ni invalida la sesión si una consulta pública devuelve 401', async () => {
+    await ingresar('jwt-existente');
+    const antes = auth.sesion();
+    const consulta = firstValueFrom(cliente.get('/api/public/destinos/7')).catch(error => error);
+    http.expectOne('/api/public/destinos/7').flush(null, { status: 401, statusText: 'Unauthorized' });
+    expect((await consulta).status).toBe(401);
+    expect(auth.sesion()).toEqual(antes);
+    expect(repo.obtenerAccessToken()).toBe('jwt-existente');
+    http.expectNone('/api/auth/refresh');
+    http.expectNone('/api/public/destinos/7');
+  });
 });

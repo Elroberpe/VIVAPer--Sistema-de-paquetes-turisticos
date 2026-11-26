@@ -29,6 +29,7 @@ describe('Navegación administrativa', () => {
     expect(harness.routeNativeElement?.querySelector('vp-header')).toBeNull();
     expect(harness.routeNativeElement?.querySelector('vp-footer')).toBeNull();
     await harness.navigateByUrl('/destinos');
+    TestBed.inject(HttpTestingController).expectOne('/api/public/destinos').flush([]);
     expect(harness.routeNativeElement?.querySelector('vp-header')).not.toBeNull();
     expect(harness.routeNativeElement?.querySelector('vp-footer')).not.toBeNull();
     expect(harness.routeNativeElement?.querySelector('.admin-sidebar')).toBeNull();

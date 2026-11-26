@@ -340,6 +340,6 @@ describe('Gestión de Destinos con la API', () => {
     expect(catalogo.snapshot).toEqual(antes);
     await harness.navigateByUrl('/destinos');
     expect(harness.routeNativeElement!.querySelector('vp-header')).not.toBeNull();
-    http.expectNone(r => r.url.startsWith('/api/public/destinos'));
+    http.expectOne('/api/public/destinos').flush([destino]);
   });
 });

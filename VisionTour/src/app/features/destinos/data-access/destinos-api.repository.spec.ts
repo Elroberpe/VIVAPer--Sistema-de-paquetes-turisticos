@@ -22,6 +22,22 @@ describe('Contrato HTTP de Destinos', () => {
   });
   afterEach(() => http.verify());
 
+  it('lista destinos públicos sin filtros ni parámetros de administración', () => {
+    repo.listarPublicos().subscribe(datos => expect(datos).toEqual([destino]));
+    const request = http.expectOne('/api/public/destinos');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.keys()).toEqual([]);
+    request.flush([destino]);
+  });
+
+  it('consulta el detalle público por ID sin utilizar la ruta administrativa', () => {
+    repo.detallePublico(7).subscribe(datos => expect(datos.idDestino).toBe(7));
+    const request = http.expectOne('/api/public/destinos/7');
+    expect(request.request.method).toBe('GET');
+    request.flush(destino);
+    http.expectNone(`${url}/7`);
+  });
+
   it('recibe un arreglo y omite filtros vacíos y parámetros de paginación', () => {
     repo.listar({ nombre: '   ' }).subscribe(datos => expect(datos).toEqual([destino]));
     const request = http.expectOne(url);
