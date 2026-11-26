@@ -1,0 +1,70 @@
+<dialog #modal class="record-dialog" aria-labelledby="destino-editor-titulo" (cancel)="cerrar($event)">
+  <header class="dialog-header">
+    <div><span class="management-eyebrow">GESTIÓN DE DESTINOS</span><h2 id="destino-editor-titulo">{{ modo() === 'crear' ? 'Nuevo destino' : modo() === 'editar' ? 'Editar destino' : 'Detalle de destino' }}</h2></div>
+    <button class="dialog-close" type="button" aria-label="Cerrar destino" autofocus [disabled]="guardando()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+
+  @if (cargando()) {
+    <div class="dialog-body loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando destino…</div>
+  } @else if (modo() === 'detalle' || (modo() === 'editar' && !destino())) {
+    <div class="dialog-body">
+      @if (error()) { <div class="destinations-error" role="alert">{{ error() }}</div> }
+      @if (destino(); as dato) {
+        <vp-destino-imagen class="destination-preview" [url]="dato.imagenUrl" [nombre]="dato.nombre" />
+        <dl class="destination-details">
+          <div><dt>ID</dt><dd>{{ dato.idDestino }}</dd></div>
+          <div><dt>Nombre</dt><dd>{{ dato.nombre }}</dd></div>
+          <div><dt>Ubicación</dt><dd>{{ dato.ubicacion }}</dd></div>
+          <div><dt>Subtítulo</dt><dd>{{ dato.subtitulo }}</dd></div>
+          <div><dt>Descripción</dt><dd>{{ dato.descripcion }}</dd></div>
+          <div><dt>Estado</dt><dd>{{ dato.estado ? 'Activo' : 'Inactivo' }}</dd></div>
+        </dl>
+      }
+    </div>
+  } @else {
+    <form id="destino-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+      <div class="dialog-body">
+        <fieldset [disabled]="guardando()">
+          <legend class="visually-hidden">Datos del destino</legend>
+          <div class="editor-fields">
+            <div>
+              <label class="form-label" for="destino-nombre">Nombre <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="destino-nombre" formControlName="nombre" maxlength="100" required [attr.aria-invalid]="(form.controls.nombre.touched && form.controls.nombre.invalid) || !!erroresCampos().nombre" aria-describedby="destino-nombre-error">
+              @if (erroresCampos().nombre || (form.controls.nombre.touched && form.controls.nombre.invalid)) { <p class="field-error" id="destino-nombre-error">{{ erroresCampos().nombre || 'Ingresa un nombre de hasta 100 caracteres, sin dejarlo vacío.' }}</p> }
+            </div>
+            <div>
+              <label class="form-label" for="destino-ubicacion">Ubicación <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="destino-ubicacion" formControlName="ubicacion" maxlength="150" required [attr.aria-invalid]="(form.controls.ubicacion.touched && form.controls.ubicacion.invalid) || !!erroresCampos().ubicacion" aria-describedby="destino-ubicacion-error">
+              @if (erroresCampos().ubicacion || (form.controls.ubicacion.touched && form.controls.ubicacion.invalid)) { <p class="field-error" id="destino-ubicacion-error">{{ erroresCampos().ubicacion || 'Ingresa una ubicación de hasta 150 caracteres, sin dejarla vacía.' }}</p> }
+            </div>
+            <div class="field-wide">
+              <label class="form-label" for="destino-subtitulo">Subtítulo <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="destino-subtitulo" formControlName="subtitulo" maxlength="100" required [attr.aria-invalid]="(form.controls.subtitulo.touched && form.controls.subtitulo.invalid) || !!erroresCampos().subtitulo" aria-describedby="destino-subtitulo-error">
+              @if (erroresCampos().subtitulo || (form.controls.subtitulo.touched && form.controls.subtitulo.invalid)) { <p class="field-error" id="destino-subtitulo-error">{{ erroresCampos().subtitulo || 'Ingresa un subtítulo de hasta 100 caracteres, sin dejarlo vacío.' }}</p> }
+            </div>
+            <div class="field-wide">
+              <label class="form-label" for="destino-descripcion">Descripción <span aria-hidden="true">*</span></label>
+              <textarea class="form-control" id="destino-descripcion" formControlName="descripcion" rows="4" required [attr.aria-invalid]="(form.controls.descripcion.touched && form.controls.descripcion.invalid) || !!erroresCampos().descripcion" aria-describedby="destino-descripcion-error"></textarea>
+              @if (erroresCampos().descripcion || (form.controls.descripcion.touched && form.controls.descripcion.invalid)) { <p class="field-error" id="destino-descripcion-error">{{ erroresCampos().descripcion || 'Ingresa una descripción, sin dejarla vacía.' }}</p> }
+            </div>
+            <div class="field-wide">
+              <label class="form-label" for="destino-imagen">URL de imagen (opcional)</label>
+              <input class="form-control" id="destino-imagen" formControlName="imagenUrl" maxlength="500" [attr.aria-invalid]="(form.controls.imagenUrl.touched && form.controls.imagenUrl.invalid) || !!erroresCampos().imagenUrl" aria-describedby="destino-imagen-ayuda destino-imagen-error">
+              <small class="field-help" id="destino-imagen-ayuda">Hasta 500 caracteres. Dejarla vacía elimina la imagen.</small>
+              @if (erroresCampos().imagenUrl || (form.controls.imagenUrl.touched && form.controls.imagenUrl.invalid)) { <p class="field-error" id="destino-imagen-error">{{ erroresCampos().imagenUrl || 'La URL de imagen admite hasta 500 caracteres.' }}</p> }
+            </div>
+          </div>
+        </fieldset>
+        @if (modo() === 'crear') { <p class="editor-note">El destino se creará activo.</p> }
+        @if (error()) { <div class="form-save-error" role="alert">{{ error() }}</div> }
+      </div>
+    </form>
+  }
+
+  <footer class="dialog-footer">
+    <button class="btn btn-outline-brand" type="button" [disabled]="guardando()" (click)="cerrar()">{{ modo() === 'detalle' ? 'Cerrar' : 'Cancelar' }}</button>
+    @if (!cargando() && modo() !== 'detalle' && (modo() === 'crear' || destino())) {
+      <button class="btn btn-primary" type="submit" form="destino-form" [disabled]="guardando()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { Guardar destino }</button>
+    }
+  </footer>
+</dialog>
