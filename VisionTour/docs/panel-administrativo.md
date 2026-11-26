@@ -2,7 +2,7 @@
 
 Estado: panel con datos de prueba y autenticación conectada a backend de VivaPeru. El apartado de login simulado descrito más abajo es histórico y queda sustituido por [autenticacion-frontend.md](autenticacion-frontend.md): se ingresa con cuentas reales ADMIN o EMPLEADO, sin credenciales de demostración en la pantalla.
 
-Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Usuarios, Servicios y Destinos administrativos guardan en el backend; Paquetes y Proveedores mantienen datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
+Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Usuarios, Servicios, Destinos y Proveedores administrativos guardan en el backend; Paquetes mantiene datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
 
 Destinos requiere ADMIN y consume `/api/admin/destinos`: nombre, ubicación, subtítulo y descripción son obligatorios; imagen es una URL opcional. Crear y editar comparten formulario; el servidor asigna el ID numérico y el estado activo inicial. Activación y desactivación son acciones independientes con confirmación. La búsqueda y el estado se filtran en servidor; orden y páginas de seis filas se resuelven localmente y se conservan en la URL. No se muestran tarjetas de cantidades. El inicio y el listado y detalle públicos consultan los mismos destinos activos mediante `/api/public/destinos`, sin autenticación.
 
@@ -40,11 +40,11 @@ En móvil la navegación se abre desde el botón de menú. Las tablas se desplaz
 | Paquetes | Experiencias, destino, categoría, duración, tarifa, descripción e itinerario. | Crear, editar y cambiar entre borrador, publicado y archivado. |
 | Destinos | Nombre, ubicación, subtítulo, descripción, URL de imagen y estado, guardados en el backend. | Consultar, crear, editar y activar o desactivar (ADMIN). |
 | Servicios | Nombre, descripción opcional y estado, guardados en el backend. | Consultar, crear, editar y activar o desactivar (ADMIN). |
-| Proveedores | Nombre comercial, contacto, correo, teléfono, ciudad y tipo. | Crear y editar; comprobar servicios activos antes de desactivar. |
+| Proveedores | Nombre, encargado, correo opcional, teléfono y estado; RUC y servicios en el detalle. | Consultar, crear, editar y activar o desactivar (ADMIN). |
 
-Las tablas ofrecen búsqueda de texto, filtros por estado, orden, filtros adicionales cuando aplican y paginación de seis filas. Paquetes y Proveedores incluyen tarjetas de indicadores sobre sus datos de prueba. Los filtros de tabla se conservan en parámetros de consulta.
+Las tablas conservan filtros y página en parámetros de consulta. Servicios y Destinos paginan localmente de seis en seis; Usuarios y Proveedores utilizan la paginación del servidor, con diez filas. Proveedores busca únicamente por nombre y respeta el orden fijo del servidor. Solo Paquetes mantiene indicadores sobre datos de prueba.
 
-El mock de Proveedores conserva servicios ficticios vinculados para sus comprobaciones internas, sin mezclarlos con Servicios de la API. La composición de paquetes mediante selección de servicios será una ampliación posterior; los incluidos de las experiencias existentes conservan sus datos de ejemplo.
+Proveedores consulta `/api/admin/proveedores` y reutiliza el catálogo de `ServiciosRepository` para asociar servicios reales mediante sus IDs. Crear y editar comparten modal; al editar se consulta el detalle completo y se conservan las asociaciones inactivas existentes. El formulario envía RUC, nombre, encargado, correo opcional, teléfono y la selección completa de servicios. Los mocks históricos quedan aislados de la pantalla real. La composición de paquetes mediante selección de servicios será una ampliación posterior; los incluidos de las experiencias existentes conservan sus datos de ejemplo.
 
 ## Login y sesión
 
@@ -66,8 +66,8 @@ La autenticación actual es una simulación de frontend. La integración real re
 
 | Área | Administrador | Operador |
 | --- | --- | --- |
-| Usuarios, Servicios y Destinos | Consultar, crear y editar. | Acceso denegado. |
-| Paquetes y Proveedores | Consultar, crear y editar. | Solo consultar. |
+| Usuarios, Servicios, Destinos y Proveedores | Consultar, crear y editar. | Acceso denegado. |
+| Paquetes | Consultar, crear y editar. | Solo consultar. |
 
 El menú mantiene las cinco opciones solicitadas; la ruta Usuarios comprueba el permiso al entrar. Un usuario sin ese permiso ve una pantalla de acceso restringido. Los nuevos usuarios reciben por defecto el rol Operador.
 
@@ -80,7 +80,7 @@ El menú mantiene las cinco opciones solicitadas; la ruta Usuarios comprueba el 
 - Un borrador o un paquete archivado no aparecen en la exploración pública.
 - Editar un paquete publicado pide confirmar la actualización del catálogo.
 - El mock histórico impide desactivar destinos con paquetes publicados. Esta comprobación no se traslada a la API actual de Destinos, que no declara esa relación.
-- No se desactiva un proveedor mientras tenga servicios activos.
+- La API de Proveedores permite desactivar conservando sus datos y asociaciones; no se aplica el bloqueo del mock histórico por servicios activos.
 - En el mock histórico, un servicio activo requiere un proveedor activo y una tarifa válida. Esta regla no se aplica a la API actual de Servicios.
 - No se realizan borrados permanentes desde esta entrega.
 - Un formulario con cambios sin guardar permite volver al editor o confirmar el descarte, conservando los datos mientras se revisa la decisión.
@@ -95,7 +95,8 @@ Los componentes dependen de contratos de repositorio inyectados. Las implementac
 - `features/admin/pages/servicios`: página específica; usa `ServiciosRepository` → `ServiciosApiRepository` y un único modal para crear, editar y consultar. Reutiliza estilos, alertas y sesión del panel. Los errores conservan el formulario y los cambios pendientes requieren confirmación de descarte al cerrar o navegar.
 - `features/admin/pages/destinos` y `features/admin/components/destino-editor-modal`: listado y formulario administrativo; reutilizan estilos y servicios del panel. El modelo y el contrato HTTP residen en `features/destinos`, junto al componente de imagen con alternativa visual. Se conservan los borradores ante errores y se confirma su descarte al cerrar o navegar.
 - `shared/catalogo`: modelos, fixtures y estado mock de paquetes, sus destinos de prueba, buscadores y editor administrativo de Paquetes.
-- `AdminMockStore`: usuarios, servicios y proveedores ficticios.
+- `features/admin/pages/proveedores` y `features/admin/components/proveedor-editor-modal`: página y formulario propios, con `ProveedoresRepository` → `ProveedoresApiRepository`. Búsqueda, filtro y paginación en servidor; reutiliza el catálogo real de Servicios. Los errores conservan el borrador y los cambios pendientes requieren confirmar el descarte.
+- `AdminMockStore`: usuarios, servicios y proveedores ficticios conservados para compatibilidad y pruebas históricas; no alimenta las pantallas reales de gestión.
 
 El editor mock de Paquetes, los buscadores y el catálogo de experiencias siguen compartiendo `CatalogoMockStore`, incluidos sus destinos ficticios y opciones de selección. Recargar restablece esos registros iniciales. Los destinos de `/admin/destinos` se guardan en el backend y no actualizan esa fuente mock. El inicio y el catálogo público de Destinos consultan la API: un destino desactivado deja de aparecer al volver a consultar, y su detalle público responde 404. Sus tarjetas llevan a `/destinos/:idDestino`; el enlace a experiencias abre el catálogo general, sin mezclar IDs reales con los de los paquetes de prueba.
 
