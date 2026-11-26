@@ -12,7 +12,12 @@
       @for (destino of estado().destinos; track destino.idDestino) {
         <div class="col-md-6"><article class="destination-feature">
           <a [routerLink]="['/destinos', destino.idDestino]" tabindex="-1" aria-hidden="true"><vp-destino-imagen [url]="destino.imagenUrl" [nombre]="destino.nombre" /></a>
-          <div class="destination-body"><span class="eyebrow">{{ destino.ubicacion }}</span><h2>{{ destino.nombre }}</h2><p class="destination-subtitle">{{ destino.subtitulo }}</p><p>{{ destino.descripcion }}</p><a class="text-link" [routerLink]="['/destinos', destino.idDestino]">Explorar {{ destino.nombre }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
+          <div class="destination-body">
+            <h2>{{ destino.nombre }}</h2>
+            <span class="eyebrow">{{ destino.ubicacion }}</span>
+            <p class="destination-subtitle">{{ destino.subtitulo }}</p>
+            <a class="text-link" [routerLink]="['/destinos', destino.idDestino]">Explorar {{ destino.nombre }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+          </div>
         </article></div>
       }
     }

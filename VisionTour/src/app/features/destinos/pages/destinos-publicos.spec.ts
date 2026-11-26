@@ -56,7 +56,7 @@ describe('Destinos para visitantes', () => {
     expect(tarjeta.textContent).toContain(destino.nombre);
     expect(tarjeta.textContent).toContain(destino.ubicacion);
     expect(tarjeta.textContent).toContain(destino.subtitulo);
-    expect(tarjeta.textContent).toContain('Conoce los paisajes del norte.');
+    expect(tarjeta.textContent).not.toContain('Conoce los paisajes del norte.');
     expect(tarjeta.querySelector('a.text-link')?.getAttribute('href')).toBe('/destinos/37');
     expect(tarjeta.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe('Sin imagen de Destino real del norte');
     expect(contenido.querySelector('.admin-sidebar')).toBeNull();
