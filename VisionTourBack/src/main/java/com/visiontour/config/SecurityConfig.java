@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/usuarios/me", "/api/usuarios/me/**")
                                 .hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/servicios", "/api/admin/servicios/**").hasRole("ADMIN")
                         .anyRequest().hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE"))
                 .build();
     }
