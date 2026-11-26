@@ -52,11 +52,12 @@ describe('Proveedores con la API', () => {
     harness = await RouterTestingHarness.create(ruta);
     vista = harness.routeDebugElement!.query(By.directive(ProveedoresAdmin)).componentInstance;
     editor = vista.editor();
-    const dialog = editor.dialog().nativeElement;
-    Object.defineProperties(dialog, {
-      showModal: { value: vi.fn(() => dialog.setAttribute('open', '')) },
-      close: { value: vi.fn(() => dialog.removeAttribute('open')) }
-    });
+    for (const dialog of [editor.dialog().nativeElement, editor.servicioEditor().dialog().nativeElement]) {
+      Object.defineProperties(dialog, {
+        showModal: { value: vi.fn(() => dialog.setAttribute('open', '')) },
+        close: { value: vi.fn(() => dialog.removeAttribute('open')) }
+      });
+    }
   }
   async function lista(datos = pagina()) {
     const request = http.expectOne(r => r.url === url); request.flush(datos); await renderizar(); return request;
@@ -71,6 +72,91 @@ describe('Proveedores con la API', () => {
     expect(catalogo.request.params.keys()).toEqual([]); catalogo.flush([activo, inactivo, otroInactivo]); await renderizar();
   }
   function completar() { editor.form.patchValue({ ruc: '20123456789', nombre: 'Nuevo proveedor', encargado: 'Luis', telefono: '+51 ext. 9' }); }
+
+  it('reutiliza Nuevo servicio, conserva el borrador y asocia el servicio solo en el PUT final', async () => {
+    await abrir(); await lista(); await editar(); editor.form.controls.nombre.setValue('Proveedor pendiente');
+    editor.cambiarSeccion('servicios'); await renderizar();
+    (editor.dialog().nativeElement.querySelector('#proveedor-nuevo-servicio') as HTMLButtonElement).click(); await renderizar();
+    const servicioEditor = editor.servicioEditor();
+    expect(editor.dialog().nativeElement.open).toBe(false); expect(servicioEditor.dialog().nativeElement.open).toBe(true);
+    expect(servicioEditor.modo()).toBe('crear'); expect(editor.creandoServicio()).toBe(true);
+    servicioEditor.form.setValue({ nombre: 'Servicio nuevo', descripcion: 'Descripción del servicio' });
+    const guardar = servicioEditor.guardar(); const request = http.expectOne(serviciosUrl);
+    expect(request.request.method).toBe('POST'); expect(request.request.body).toEqual({ nombre: 'Servicio nuevo', descripcion: 'Descripción del servicio' });
+    http.expectNone(r => r.url === `${url}/15` && r.method === 'PUT');
+    const nuevo = { ...activo, idServicio: 99, nombre: 'Servicio nuevo' }; request.flush(nuevo); await guardar; await renderizar();
+    expect(editor.dialog().nativeElement.open).toBe(true); expect(servicioEditor.dialog().nativeElement.open).toBe(false);
+    expect(editor.creandoServicio()).toBe(false); expect(editor.seccion()).toBe('servicios');
+    expect(editor.form.controls.nombre.value).toBe('Proveedor pendiente'); expect(editor.form.controls.serviciosIds.value).toEqual([2, 99]);
+    expect(editor.form.dirty).toBe(true); expect(editor.opcionesServicios()).toContainEqual(nuevo);
+    expect(document.activeElement?.id).toBe('proveedor-nuevo-servicio');
+    expect(editor.dialog().nativeElement.textContent).toContain('Servicio creado y seleccionado.');
+    const guardarProveedor = editor.guardar(); const put = http.expectOne(`${url}/15`);
+    expect(put.request.body.serviciosIds).toEqual([2, 99]); expect(put.request.body.nombre).toBe('Proveedor pendiente');
+    put.flush(proveedor); await guardarProveedor; await lista();
+  });
+
+  it('ofrece Nuevo servicio con catálogo vacío y lo incluye al crear el proveedor', async () => {
+    await abrir(); await lista(); editor.abrir('crear'); http.expectOne(r => r.url === serviciosUrl).flush([]); completar();
+    editor.cambiarSeccion('servicios'); await renderizar();
+    expect((editor.dialog().nativeElement.querySelector('#proveedor-nuevo-servicio') as HTMLButtonElement).disabled).toBe(false);
+    editor.nuevoServicio(); const servicioEditor = editor.servicioEditor(); servicioEditor.form.controls.nombre.setValue('Guiado nuevo');
+    const guardarServicio = servicioEditor.guardar(); http.expectOne(serviciosUrl).flush({ ...activo, idServicio: 99, nombre: 'Guiado nuevo' }); await guardarServicio;
+    const guardarProveedor = editor.guardar(); const request = http.expectOne(url);
+    expect(request.request.method).toBe('POST'); expect(request.request.body.serviciosIds).toEqual([99]);
+    request.flush(proveedor); await guardarProveedor; await lista();
+  });
+
+  it('cancelar Nuevo servicio devuelve al proveedor sin modificar datos ni selecciones', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.seleccionar(activo, true);
+    const borrador = editor.form.getRawValue(); editor.nuevoServicio(); await editor.servicioEditor().cerrar(); await renderizar();
+    expect(editor.dialog().nativeElement.open).toBe(true); expect(editor.form.getRawValue()).toEqual(borrador);
+    expect(editor.seccion()).toBe('servicios'); expect(confirmar).not.toHaveBeenCalled();
+    http.expectNone(r => r.method === 'POST' || r.method === 'PUT');
+  });
+
+  it('Escape conserva el borrador de servicio si se rechaza su descarte', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.nuevoServicio();
+    const servicioEditor = editor.servicioEditor(); servicioEditor.form.controls.nombre.setValue('Servicio pendiente'); servicioEditor.form.markAsDirty();
+    confirmar.mockResolvedValue(false);
+    servicioEditor.dialog().nativeElement.dispatchEvent(new Event('cancel', { cancelable: true })); await renderizar();
+    expect(servicioEditor.dialog().nativeElement.open).toBe(true); expect(editor.dialog().nativeElement.open).toBe(false);
+    expect(servicioEditor.form.controls.nombre.value).toBe('Servicio pendiente');
+    confirmar.mockResolvedValue(true); await servicioEditor.cerrar();
+    expect(editor.dialog().nativeElement.open).toBe(true); expect(editor.form.controls.serviciosIds.value).toEqual([2]);
+  });
+
+  it('mantiene abierto el servicio ante un nombre duplicado y no guarda el proveedor', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.nuevoServicio();
+    const servicioEditor = editor.servicioEditor(); servicioEditor.form.controls.nombre.setValue('Alojamiento');
+    const guardar = servicioEditor.guardar(); http.expectOne(serviciosUrl).flush({}, { status: 409, statusText: 'Conflict' }); await guardar;
+    expect(servicioEditor.dialog().nativeElement.open).toBe(true); expect(editor.dialog().nativeElement.open).toBe(false);
+    expect(servicioEditor.erroresCampos().nombre).toContain('Ya existe'); expect(editor.form.controls.serviciosIds.value).toEqual([2]);
+    http.expectNone(r => r.url.startsWith(url) && r.method !== 'GET');
+  });
+
+  it('bloquea navegación, doble apertura y guardado del proveedor mientras se crea el servicio', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.nuevoServicio();
+    const servicioEditor = editor.servicioEditor(); servicioEditor.form.controls.nombre.setValue('Servicio pendiente');
+    const guardar = servicioEditor.guardar(); const request = http.expectOne(serviciosUrl);
+    editor.nuevoServicio(); editor.abrir('crear'); await editor.guardar(); await servicioEditor.guardar();
+    expect(await vista.confirmarSalida()).toBe(false); expect(editor.cambiarSeccion('datos')).toBe(false);
+    expect(editor.form.controls.nombre.value).toBe('Hotel Andino'); http.expectNone(r => r.method === 'POST' || r.method === 'PUT');
+    request.flush({ ...activo, idServicio: 99 }); await guardar; expect(editor.dialog().nativeElement.open).toBe(true);
+  });
+
+  it('consulta los cambios pendientes de servicio y proveedor antes de salir de la ruta', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.seleccionar(activo, true); editor.nuevoServicio();
+    const servicioEditor = editor.servicioEditor(); servicioEditor.form.controls.nombre.setValue('Borrador de servicio'); servicioEditor.form.markAsDirty();
+    confirmar.mockResolvedValue(false); await harness.navigateByUrl('/admin/paquetes');
+    expect(TestBed.inject(Router).url).toBe('/admin/proveedores'); expect(servicioEditor.dialog().nativeElement.open).toBe(true);
+    confirmar.mockReset().mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+    await harness.navigateByUrl('/admin/paquetes');
+    expect(confirmar).toHaveBeenCalledTimes(2); expect(TestBed.inject(Router).url).toBe('/admin/proveedores');
+    expect(servicioEditor.dialog().nativeElement.open).toBe(false); expect(editor.dialog().nativeElement.open).toBe(true);
+    expect(editor.form.controls.serviciosIds.value).toEqual([2, 1]);
+    confirmar.mockResolvedValue(true); await harness.navigateByUrl('/admin/paquetes'); expect(TestBed.inject(Router).url).toBe('/admin/paquetes');
+  });
 
   it('valida Datos antes de avanzar y conserva datos y servicios hasta el único POST final', async () => {
     await abrir(); await lista(); editor.abrir('crear'); http.expectOne(r => r.url === serviciosUrl).flush([activo]); await renderizar();

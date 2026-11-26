@@ -60,9 +60,14 @@
             </div>
           </div>
           <div class="provider-panel" id="proveedor-panel-servicios" role="tabpanel" aria-labelledby="proveedor-tab-servicios" [hidden]="seccion() !== 'servicios'">
+            <div class="services-heading">
+              <span class="form-label">Asocia servicios al proveedor</span>
+              <button class="btn btn-outline-brand" id="proveedor-nuevo-servicio" type="button" [disabled]="guardando() || cargandoServicios()" (click)="nuevoServicio()"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo servicio</button>
+            </div>
+            @if (mensajeServicio()) { <p class="service-created" role="status">{{ mensajeServicio() }}</p> }
             <fieldset aria-describedby="proveedor-servicios-ayuda proveedor-servicios-error">
-              <legend class="form-label">Servicios <span class="text-muted">(opcional)</span></legend>
-              <small class="field-help" id="proveedor-servicios-ayuda">Puedes agregar servicios activos. Los inactivos ya asociados pueden conservarse o retirarse; si los retiras y guardas, no podrás volver a agregarlos mientras sigan inactivos.</small>
+              <legend class="visually-hidden">Servicios (opcional)</legend>
+              <small class="field-help" id="proveedor-servicios-ayuda">Selección opcional. Los inactivos retirados requieren reactivación.</small>
               <div class="service-options">
                 @for (servicio of opcionesServicios(); track servicio.idServicio) {
                   <label class="service-option"><input type="checkbox" [checked]="seleccion().includes(servicio.idServicio)" [disabled]="!servicio.estado && !asociado(servicio.idServicio) && !seleccion().includes(servicio.idServicio)" (change)="seleccionar(servicio, $any($event.target).checked)"><span>{{ servicio.nombre }}@if (!servicio.estado) { <small>{{ asociado(servicio.idServicio) ? 'Inactivo · asociación existente' : 'Ya no está activo · retíralo para continuar' }}</small> }</span></label>
@@ -91,3 +96,5 @@
     }
   </footer>
 </dialog>
+
+<vp-servicio-editor-modal (guardado)="servicioCreado($event)" (cerrado)="volverAlProveedor()" />

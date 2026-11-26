@@ -10,13 +10,14 @@ import { ProveedoresRepository } from '../data-access/proveedores.repository';
 import { erroresCamposProveedor, mensajeProveedores } from '../data-access/proveedores-errors';
 import { Proveedor, ProveedorDatos } from '../models/proveedor';
 import { Servicio } from '../models/servicio';
+import { ServicioEditorModal } from './servicio-editor-modal';
 
 type ModoEditor = 'crear' | 'editar' | 'detalle';
 type SeccionProveedor = 'datos' | 'servicios';
 const camposDatos = ['ruc', 'nombre', 'encargado', 'email', 'telefono'] as const;
 
 @Component({
-  selector: 'vp-proveedor-editor-modal', imports: [ReactiveFormsModule], templateUrl: './proveedor-editor-modal.html',
+  selector: 'vp-proveedor-editor-modal', imports: [ReactiveFormsModule, ServicioEditorModal], templateUrl: './proveedor-editor-modal.html',
   styleUrls: ['../pages/gestion.css', '../pages/proveedores/proveedores.css']
 })
 export class ProveedorEditorModal {
@@ -31,6 +32,9 @@ export class ProveedorEditorModal {
   private id?: number;
   readonly guardado = output<Proveedor>();
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('modal');
+  readonly servicioEditor = viewChild.required(ServicioEditorModal);
+  readonly creandoServicio = signal(false);
+  readonly mensajeServicio = signal('');
   readonly modo = signal<ModoEditor>('crear');
   readonly seccion = signal<SeccionProveedor>('datos');
   readonly pestanas = [
@@ -58,10 +62,11 @@ export class ProveedorEditorModal {
   });
 
   abrir(modo: ModoEditor, id?: number) {
-    if (this.guardando() || this.cerrando || this.dialog().nativeElement.open || !this.auth.esAdministrador()) return;
+    if (this.guardando() || this.cerrando || this.creandoServicio() || this.dialog().nativeElement.open || !this.auth.esAdministrador()) return;
     if (modo !== 'crear' && (!Number.isInteger(id) || id! <= 0)) return;
     this.id = id;
     this.seccion.set('datos');
+    this.mensajeServicio.set('');
     this.modo.set(modo); this.proveedor.set(null); this.servicios.set([]); this.seleccion.set([]);
     this.form.reset(); this.error.set(''); this.erroresCampos.set({}); this.errorServicios.set(''); this.cargaCompleta.set(false);
     this.dialog().nativeElement.showModal();
@@ -86,7 +91,7 @@ export class ProveedorEditorModal {
   asociado(id: number) { return this.proveedor()?.servicios.some(s => s.idServicio === id) ?? false; }
 
   cambiarSeccion(seccion: SeccionProveedor): boolean {
-    if (this.guardando() || this.cargando() || this.cargandoServicios() || !this.cargaCompleta() || this.cerrando || this.modo() === 'detalle') return false;
+    if (this.guardando() || this.cargando() || this.cargandoServicios() || this.creandoServicio() || !this.cargaCompleta() || this.cerrando || this.modo() === 'detalle') return false;
     if (seccion === 'servicios' && !this.validarDatos()) return false;
     this.seccion.set(seccion);
     this.dialog().nativeElement.querySelector<HTMLButtonElement>(`#proveedor-tab-${seccion}`)?.focus();
@@ -112,6 +117,27 @@ export class ProveedorEditorModal {
     return true;
   }
 
+  nuevoServicio() {
+    if (!this.auth.esAdministrador() || this.guardando() || this.cerrando || this.cargandoServicios() || this.creandoServicio() || !this.cargaCompleta() || this.seccion() !== 'servicios' || this.modo() === 'detalle' || !this.dialog().nativeElement.open) return;
+    this.creandoServicio.set(true);
+    this.dialog().nativeElement.close();
+    this.servicioEditor().abrir('crear');
+    if (!this.servicioEditor().dialog().nativeElement.open) this.volverAlProveedor();
+  }
+
+  volverAlProveedor() {
+    if (!this.creandoServicio()) return;
+    this.creandoServicio.set(false);
+    this.dialog().nativeElement.showModal();
+    this.dialog().nativeElement.querySelector<HTMLButtonElement>('#proveedor-nuevo-servicio')?.focus();
+  }
+
+  servicioCreado(servicio: Servicio) {
+    this.servicios.update(servicios => [...servicios.filter(s => s.idServicio !== servicio.idServicio), servicio]);
+    this.seleccionar(servicio, true);
+    this.mensajeServicio.set('Servicio creado y seleccionado.');
+  }
+
   seleccionar(servicio: Servicio, seleccionado: boolean) {
     if (this.guardando() || this.cargandoServicios() || this.modo() === 'detalle') return;
     if (seleccionado && !servicio.estado && !this.asociado(servicio.idServicio)) return;
@@ -129,7 +155,7 @@ export class ProveedorEditorModal {
   }
 
   async guardar() {
-    if (this.guardando() || this.cargando() || this.cargandoServicios() || this.errorServicios() || !this.cargaCompleta() || this.cerrando || this.modo() === 'detalle') return;
+    if (this.guardando() || this.cargando() || this.cargandoServicios() || this.creandoServicio() || this.errorServicios() || !this.cargaCompleta() || this.cerrando || this.modo() === 'detalle') return;
     if (this.modo() === 'editar' && !this.proveedor()) return;
     this.error.set(''); this.erroresCampos.set({});
     if (!this.auth.esAdministrador()) { this.error.set('No tienes permiso para gestionar proveedores.'); return; }
@@ -154,6 +180,7 @@ export class ProveedorEditorModal {
 
   async confirmarSalida(): Promise<boolean> {
     if (this.guardando() || this.cargandoServicios() || this.cerrando) return false;
+    if (this.creandoServicio() && !await this.servicioEditor().confirmarSalida()) return false;
     const modal = this.dialog().nativeElement;
     if (!modal.open) return true;
     if (this.modo() !== 'detalle' && this.form.dirty) {
@@ -171,5 +198,6 @@ export class ProveedorEditorModal {
     this.consulta?.unsubscribe(); this.dialog().nativeElement.close(); this.form.reset();
     this.proveedor.set(null); this.servicios.set([]); this.seleccion.set([]); this.cargando.set(false);
     this.cargaCompleta.set(false); this.error.set(''); this.errorServicios.set(''); this.erroresCampos.set({});
+    this.mensajeServicio.set('');
   }
 }

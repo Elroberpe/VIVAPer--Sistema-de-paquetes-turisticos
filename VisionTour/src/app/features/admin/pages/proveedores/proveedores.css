@@ -8,6 +8,10 @@
 .service-option { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; overflow-wrap: anywhere; }
 .service-option input { flex-shrink: 0; margin-top: 4px; accent-color: var(--color-brand); }
 .service-option small { display: block; color: var(--color-text-muted); font-size: 11px; }
+.services-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.services-heading .form-label { margin: 0; }
+.services-heading .btn { font-size: 12px; }
+.service-created { color: var(--color-positive-text); font-size: 12px; margin-bottom: 12px; }
 .provider-tabs { display: flex; gap: 24px; padding-inline: 27px; border-bottom: 1px solid var(--color-border-subtle); }
 .provider-tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 2px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--color-text-muted); font-size: 13px; font-weight: 600; }
 .provider-tabs button[aria-selected="true"] { border-bottom-color: var(--color-action); color: var(--color-brand); }
