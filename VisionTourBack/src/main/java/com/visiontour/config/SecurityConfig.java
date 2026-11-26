@@ -67,10 +67,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/registro", "/api/auth/login",
                                 "/api/auth/refresh", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/public/destinos", "/api/public/destinos/**").permitAll()
                         .requestMatchers("/api/usuarios/me", "/api/usuarios/me/**")
                                 .hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
                         .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/servicios", "/api/admin/servicios/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/destinos", "/api/admin/destinos/**").hasRole("ADMIN")
                         .anyRequest().hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE"))
                 .build();
     }
