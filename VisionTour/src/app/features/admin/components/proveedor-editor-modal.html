@@ -61,13 +61,12 @@
           </div>
           <div class="provider-panel" id="proveedor-panel-servicios" role="tabpanel" aria-labelledby="proveedor-tab-servicios" [hidden]="seccion() !== 'servicios'">
             <div class="services-heading">
-              <span class="form-label">Asocia servicios al proveedor</span>
+              <span class="form-label" id="proveedor-servicios-ayuda">Selección opcional. Los inactivos retirados requieren reactivación.</span>
               <button class="btn btn-outline-brand" id="proveedor-nuevo-servicio" type="button" [disabled]="guardando() || cargandoServicios()" (click)="nuevoServicio()"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo servicio</button>
             </div>
             @if (mensajeServicio()) { <p class="service-created" role="status">{{ mensajeServicio() }}</p> }
             <fieldset aria-describedby="proveedor-servicios-ayuda proveedor-servicios-error">
               <legend class="visually-hidden">Servicios (opcional)</legend>
-              <span class="field-help" id="proveedor-servicios-ayuda">Selección opcional. Los inactivos retirados requieren reactivación.</span>
               <div class="service-options">
                 @for (servicio of opcionesServicios(); track servicio.idServicio) {
                   <label class="service-option"><input type="checkbox" [checked]="seleccion().includes(servicio.idServicio)" [disabled]="!servicio.estado && !asociado(servicio.idServicio) && !seleccion().includes(servicio.idServicio)" (change)="seleccionar(servicio, $any($event.target).checked)"><span>{{ servicio.nombre }}@if (!servicio.estado) { <small>{{ asociado(servicio.idServicio) ? 'Inactivo · asociación existente' : 'Ya no está activo · retíralo para continuar' }}</small> }</span></label>
