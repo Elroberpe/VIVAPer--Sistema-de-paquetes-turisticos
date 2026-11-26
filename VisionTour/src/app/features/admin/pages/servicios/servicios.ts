@@ -64,14 +64,6 @@ export class ServiciosAdmin {
   readonly visibles = computed(() => this.ordenados().slice((this.pagina() - 1) * filasPorPagina, this.pagina() * filasPorPagina));
   readonly inicio = computed(() => this.visibles().length ? (this.pagina() - 1) * filasPorPagina + 1 : 0);
   readonly fin = computed(() => this.inicio() ? this.inicio() + this.visibles().length - 1 : 0);
-  readonly estadisticas = computed(() => {
-    const registros = this.fuente().registros;
-    return [
-      { etiqueta: 'Servicios encontrados', valor: registros.length, icono: 'bi-grid', clase: 'blue' },
-      { etiqueta: 'Activos encontrados', valor: registros.filter(r => r.estado).length, icono: 'bi-check2-circle', clase: 'green' },
-      { etiqueta: 'Inactivos encontrados', valor: registros.filter(r => !r.estado).length, icono: 'bi-pause-circle', clase: 'orange' }
-    ];
-  });
 
   constructor() {
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => this.busqueda.setValue(params.get('q') ?? ''));

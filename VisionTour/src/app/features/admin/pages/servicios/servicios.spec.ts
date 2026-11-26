@@ -74,7 +74,6 @@ describe('Gestión de Servicios con la API', () => {
     expect(tabla.querySelector('tbody td')?.textContent).toBe('7');
     expect(tabla.textContent).not.toMatch(/Proveedor|Tarifa/);
     expect(harness.routeNativeElement!.textContent).not.toContain('Datos ficticios');
-    expect(harness.routeNativeElement!.textContent).toContain('Según los filtros actuales');
   });
 
   it('busca en servidor, conserva filtros en la URL y envía estado=false', async () => {

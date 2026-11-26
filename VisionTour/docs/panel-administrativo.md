@@ -2,7 +2,7 @@
 
 Estado: panel con datos de prueba y autenticación conectada a backend de VivaPeru. El apartado de login simulado descrito más abajo es histórico y queda sustituido por [autenticacion-frontend.md](autenticacion-frontend.md): se ingresa con cuentas reales ADMIN o EMPLEADO, sin credenciales de demostración en la pantalla.
 
-Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Sus indicadores describen los resultados filtrados. Usuarios y Servicios guardan en el backend; Paquetes, Destinos y Proveedores mantienen datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
+Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Usuarios y Servicios guardan en el backend; Paquetes, Destinos y Proveedores mantienen datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
 
 ## Menú vigente
 
@@ -40,7 +40,7 @@ En móvil la navegación se abre desde el botón de menú. Las tablas se desplaz
 | Servicios | Nombre, descripción opcional y estado, guardados en el backend. | Consultar, crear, editar y activar o desactivar (ADMIN). |
 | Proveedores | Nombre comercial, contacto, correo, teléfono, ciudad y tipo. | Crear y editar; comprobar servicios activos antes de desactivar. |
 
-Las tablas ofrecen búsqueda de texto, filtros por estado, orden, filtros adicionales cuando aplican y paginación de seis filas. Las tarjetas de indicadores reflejan el conjunto de registros de cada sección. Los filtros de tabla se conservan en parámetros de consulta.
+Las tablas ofrecen búsqueda de texto, filtros por estado, orden, filtros adicionales cuando aplican y paginación de seis filas. Paquetes, Destinos y Proveedores incluyen tarjetas de indicadores sobre sus datos de prueba. Los filtros de tabla se conservan en parámetros de consulta.
 
 El mock de Proveedores conserva servicios ficticios vinculados para sus comprobaciones internas, sin mezclarlos con Servicios de la API. La composición de paquetes mediante selección de servicios será una ampliación posterior; los incluidos de las experiencias existentes conservan sus datos de ejemplo.
 

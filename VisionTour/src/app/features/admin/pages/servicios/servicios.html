@@ -6,11 +6,6 @@
       <button class="btn btn-outline-brand" type="button" [disabled]="fuente().cargando" (click)="recargar()"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar</button>
     </div>
   </div>
-  <div class="stats-grid">
-    @for (stat of estadisticas(); track stat.etiqueta) {
-      <article class="stat-card"><div class="stat-top"><span>{{ stat.etiqueta }}</span><span [class]="'stat-icon ' + stat.clase"><i [class]="'bi ' + stat.icono" aria-hidden="true"></i></span></div><strong>{{ fuente().cargando || fuente().error ? '—' : stat.valor }}</strong><small>Según los filtros actuales</small></article>
-    }
-  </div>
   @if (mensaje()) { <div class="save-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}<button type="button" aria-label="Cerrar aviso" (click)="mensaje.set('')"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div> }
   @if (errorAccion()) { <div class="services-error" role="alert">{{ errorAccion() }}</div> }
 
