@@ -2,6 +2,8 @@
 
 Estado: panel con datos de prueba y autenticación conectada a backend de VivaPeru. El apartado de login simulado descrito más abajo es histórico y queda sustituido por [autenticacion-frontend.md](autenticacion-frontend.md): se ingresa con cuentas reales ADMIN o EMPLEADO, sin credenciales de demostración en la pantalla.
 
+Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Usuarios y Servicios guardan en el backend; Paquetes, Destinos y Proveedores mantienen datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
+
 ## Menú vigente
 
 La barra lateral contiene exactamente estas cinco opciones, en este orden:
@@ -35,12 +37,12 @@ En móvil la navegación se abre desde el botón de menú. Las tablas se desplaz
 | Usuarios | Personal interno, correo, rol y estado. | Buscar, filtrar, consultar, crear y editar. |
 | Paquetes | Experiencias, destino, categoría, duración, tarifa, descripción e itinerario. | Crear, editar y cambiar entre borrador, publicado y archivado. |
 | Destinos | Nombre, presentación, descripción, fotografía y estado. | Crear y editar; comprobar dependencias antes de desactivar. |
-| Servicios | Guiado, transporte, alojamiento o actividad, proveedor y tarifa. | Crear, editar y activar o desactivar. |
+| Servicios | Nombre, descripción opcional y estado, guardados en el backend. | Consultar, crear, editar y activar o desactivar (ADMIN). |
 | Proveedores | Nombre comercial, contacto, correo, teléfono, ciudad y tipo. | Crear y editar; comprobar servicios activos antes de desactivar. |
 
-Las tablas ofrecen búsqueda de texto, filtros por estado, orden, filtros adicionales cuando aplican y paginación de seis filas. Las tarjetas de indicadores reflejan el conjunto de registros de cada sección. Los filtros de tabla se conservan en parámetros de consulta.
+Las tablas ofrecen búsqueda de texto, filtros por estado, orden, filtros adicionales cuando aplican y paginación de seis filas. Paquetes, Destinos y Proveedores incluyen tarjetas de indicadores sobre sus datos de prueba. Los filtros de tabla se conservan en parámetros de consulta.
 
-Servicios y proveedores forman una base de gestión de prueba vinculada entre sí. La composición de paquetes mediante selección de estos servicios será una ampliación posterior; los incluidos de las experiencias existentes conservan sus datos de ejemplo.
+El mock de Proveedores conserva servicios ficticios vinculados para sus comprobaciones internas, sin mezclarlos con Servicios de la API. La composición de paquetes mediante selección de servicios será una ampliación posterior; los incluidos de las experiencias existentes conservan sus datos de ejemplo.
 
 ## Login y sesión
 
@@ -62,8 +64,8 @@ La autenticación actual es una simulación de frontend. La integración real re
 
 | Área | Administrador | Operador |
 | --- | --- | --- |
-| Usuarios | Consultar, crear y editar. | Acceso denegado. |
-| Paquetes, Destinos, Servicios y Proveedores | Consultar, crear y editar. | Solo consultar. |
+| Usuarios y Servicios | Consultar, crear y editar. | Acceso denegado. |
+| Paquetes, Destinos y Proveedores | Consultar, crear y editar. | Solo consultar. |
 
 El menú mantiene las cinco opciones solicitadas; la ruta Usuarios comprueba el permiso al entrar. Un usuario sin ese permiso ve una pantalla de acceso restringido. Los nuevos usuarios reciben por defecto el rol Operador.
 
@@ -77,7 +79,7 @@ El menú mantiene las cinco opciones solicitadas; la ruta Usuarios comprueba el 
 - Editar un paquete publicado pide confirmar la actualización del catálogo.
 - No se desactiva un destino mientras tenga paquetes publicados.
 - No se desactiva un proveedor mientras tenga servicios activos.
-- Un servicio activo requiere un proveedor activo y una tarifa válida.
+- En el mock histórico, un servicio activo requiere un proveedor activo y una tarifa válida. Esta regla no se aplica a la API actual de Servicios.
 - No se realizan borrados permanentes desde esta entrega.
 - Un formulario con cambios sin guardar permite volver al editor o confirmar el descarte, conservando los datos mientras se revisa la decisión.
 
@@ -88,6 +90,7 @@ Los componentes dependen de contratos de repositorio inyectados. Las implementac
 - `core/auth`: sesión, rutas protegidas y control de regreso al panel.
 - `features/auth`: login, modelo de sesión y contrato de autenticación.
 - `features/admin`: configuración de las cinco secciones, modelos, tablas, formularios y repositorio administrativo.
+- `features/admin/pages/servicios`: página específica; usa `ServiciosRepository` → `ServiciosApiRepository` y un único modal para crear, editar y consultar. Reutiliza estilos, alertas y sesión del panel. Los errores conservan el formulario y los cambios pendientes requieren confirmación de descarte al cerrar o navegar.
 - `shared/catalogo`: modelos, fixtures y estado compartido por el sitio público y la gestión de paquetes y destinos.
 - `AdminMockStore`: usuarios, servicios y proveedores ficticios.
 

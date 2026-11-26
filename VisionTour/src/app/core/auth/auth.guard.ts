@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   }
 };
 
-export const usuariosGuard: CanActivateFn = async () => {
+export const administradorGuard: CanActivateFn = async () => {
   const auth = inject(AuthSessionService);
   const router = inject(Router);
   await auth.restaurar();

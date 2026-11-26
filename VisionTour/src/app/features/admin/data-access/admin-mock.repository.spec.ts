@@ -45,6 +45,7 @@ describe('Acceso y administración de prueba', () => {
     for (const url of ['https://otro.example', '//otro.example', '/admin/login', '/admin/paquetes/../../login', '/admin/usuarios-mal', '/admin/paquetes\\..']) expect(destinoAdminSeguro(url)).toBe('/admin/usuarios');
     expect(destinoAdminSeguro('/admin/destinos?q=Cusco')).toBe('/admin/destinos?q=Cusco');
     expect(destinoAdminSeguro('/admin/usuarios', false)).toBe('/admin/paquetes');
+    expect(destinoAdminSeguro('/admin/servicios?estado=Inactivo', false)).toBe('/admin/paquetes');
   });
   it('no permite guardar sin sesión ni con un operador', async () => {
     const registro: RegistroAdmin = { id: '', nombre: 'Nuevo proveedor', descripcion: '', estado: 'Activo' };

@@ -6,7 +6,7 @@ import { SesionAdmin } from '../../features/auth/models/sesion';
 export function destinoAdminSeguro(url: string | null, esAdmin = true): string {
   const inicio = esAdmin ? '/admin/usuarios' : '/admin/paquetes';
   if (!url || !/^\/admin\/(usuarios|paquetes|destinos|servicios|proveedores)\/?$/.test(url.split(/[?#]/)[0]) || /[\\\u0000-\u001f]/.test(url)) return inicio;
-  if (!esAdmin && /^\/admin\/usuarios(?:[/?#]|$)/.test(url)) return inicio;
+  if (!esAdmin && /^\/admin\/(usuarios|servicios)(?:[/?#]|$)/.test(url)) return inicio;
   return url;
 }
 

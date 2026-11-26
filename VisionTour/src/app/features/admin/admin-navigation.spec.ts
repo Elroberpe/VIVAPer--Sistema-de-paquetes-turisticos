@@ -40,5 +40,8 @@ describe('Navegación administrativa', () => {
     await harness.navigateByUrl('/admin/paquetes');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Paquetes');
     expect(harness.routeNativeElement?.querySelector('.create-button')).toBeNull();
+    await harness.navigateByUrl('/admin/servicios');
+    expect(harness.routeNativeElement?.textContent).toContain('Esta sección requiere otro permiso.');
+    TestBed.inject(HttpTestingController).expectNone(request => request.url === '/api/admin/servicios');
   });
 });

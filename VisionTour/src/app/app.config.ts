@@ -11,6 +11,8 @@ import { AuthApiRepository } from './features/auth/data-access/auth-api.reposito
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AdminRepository } from './features/admin/data-access/admin.repository';
 import { AdminMockRepository } from './features/admin/data-access/admin-mock.repository';
+import { ServiciosRepository } from './features/admin/data-access/servicios.repository';
+import { ServiciosApiRepository } from './features/admin/data-access/servicios-api.repository';
 
 registerLocaleData(localeEsPe);
 export const appConfig: ApplicationConfig = {
@@ -20,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor]), withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' })),
     { provide: AuthRepository, useClass: AuthApiRepository },
     { provide: AdminRepository, useClass: AdminMockRepository },
+    { provide: ServiciosRepository, useClass: ServiciosApiRepository },
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }))
   ]
 };

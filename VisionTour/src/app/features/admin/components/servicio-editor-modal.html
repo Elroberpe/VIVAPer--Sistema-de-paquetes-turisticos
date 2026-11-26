@@ -1,0 +1,52 @@
+<dialog #modal class="record-dialog" aria-labelledby="servicio-editor-titulo" (cancel)="cerrar($event)">
+  <header class="dialog-header">
+    <div><span class="management-eyebrow">GESTIÓN DE SERVICIOS</span><h2 id="servicio-editor-titulo">{{ modo() === 'crear' ? 'Nuevo servicio' : modo() === 'editar' ? 'Editar servicio' : 'Detalle de servicio' }}</h2></div>
+    <button class="dialog-close" type="button" aria-label="Cerrar servicio" autofocus [disabled]="guardando()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+
+  @if (cargando()) {
+    <div class="dialog-body loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando servicio…</div>
+  } @else if (modo() === 'detalle' || (modo() === 'editar' && !servicio())) {
+    <div class="dialog-body">
+      @if (error()) { <div class="services-error" role="alert">{{ error() }}</div> }
+      @if (servicio(); as dato) {
+        <dl class="service-details">
+          <div><dt>ID</dt><dd>{{ dato.idServicio }}</dd></div>
+          <div><dt>Nombre</dt><dd>{{ dato.nombre }}</dd></div>
+          <div><dt>Descripción</dt><dd>{{ dato.descripcion || 'Sin descripción' }}</dd></div>
+          <div><dt>Estado</dt><dd>{{ dato.estado ? 'Activo' : 'Inactivo' }}</dd></div>
+        </dl>
+      }
+    </div>
+  } @else {
+    <form id="servicio-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+      <div class="dialog-body">
+        <fieldset [disabled]="guardando()">
+          <legend class="visually-hidden">Datos del servicio</legend>
+          <div class="editor-fields">
+            <div class="field-wide">
+              <label class="form-label" for="servicio-nombre">Nombre <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="servicio-nombre" formControlName="nombre" maxlength="100" required [attr.aria-invalid]="(form.controls.nombre.touched && form.controls.nombre.invalid) || !!erroresCampos().nombre" aria-describedby="servicio-nombre-error">
+              @if (erroresCampos().nombre || (form.controls.nombre.touched && form.controls.nombre.invalid)) { <p class="field-error" id="servicio-nombre-error">{{ erroresCampos().nombre || 'Ingresa un nombre de hasta 100 caracteres, sin dejarlo vacío.' }}</p> }
+            </div>
+            <div class="field-wide">
+              <label class="form-label" for="servicio-descripcion">Descripción <span class="text-muted">(opcional)</span></label>
+              <textarea class="form-control" id="servicio-descripcion" formControlName="descripcion" rows="4" maxlength="255" [attr.aria-invalid]="(form.controls.descripcion.touched && form.controls.descripcion.invalid) || !!erroresCampos().descripcion" aria-describedby="servicio-descripcion-ayuda servicio-descripcion-error"></textarea>
+              <small class="field-help" id="servicio-descripcion-ayuda">Hasta 255 caracteres. Dejarla vacía elimina la descripción.</small>
+              @if (erroresCampos().descripcion || (form.controls.descripcion.touched && form.controls.descripcion.invalid)) { <p class="field-error" id="servicio-descripcion-error">{{ erroresCampos().descripcion || 'La descripción admite hasta 255 caracteres.' }}</p> }
+            </div>
+          </div>
+        </fieldset>
+        @if (modo() === 'crear') { <p class="editor-note">El servicio se creará activo.</p> }
+        @if (error()) { <div class="form-save-error" role="alert">{{ error() }}</div> }
+      </div>
+    </form>
+  }
+
+  <footer class="dialog-footer">
+    <button class="btn btn-outline-brand" type="button" [disabled]="guardando()" (click)="cerrar()">{{ modo() === 'detalle' ? 'Cerrar' : 'Cancelar' }}</button>
+    @if (!cargando() && modo() !== 'detalle' && (modo() === 'crear' || servicio())) {
+      <button class="btn btn-primary" type="submit" form="servicio-form" [disabled]="guardando()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { Guardar servicio }</button>
+    }
+  </footer>
+</dialog>
