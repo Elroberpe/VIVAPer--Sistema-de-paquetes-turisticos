@@ -35,6 +35,12 @@ Las fechas de ejemplo se generan a 21, 28 y 42 días de la fecha de apertura de 
 
 La consulta de viaje muestra un resumen en SweetAlert2. Los formularios de reserva y los pagos simulados pertenecen a la siguiente entrega; todavía no se crean reservas ni se procesan pagos.
 
+## Destinos para visitantes
+
+Los destinos del inicio y `/destinos` se consultan desde `GET /api/public/destinos`, sin requerir sesión. Las tarjetas muestran los datos activos del backend y abren `/destinos/{idDestino}`; el detalle usa `GET /api/public/destinos/{idDestino}` y muestra nombre, ubicación, subtítulo, descripción e imagen. Una imagen ausente o que no carga tiene una alternativa visual. Listado e inicio muestran carga, vacío, error y reintento; el detalle distingue los destinos inexistentes o inactivos mediante el `404` del backend. Cada entrada o reconsulta vuelve a pedir los datos, sin caché global del catálogo público.
+
+Estas consultas omiten `Authorization`, incluso si hay una sesión abierta. Un error público no intenta renovar ni invalidar la sesión. La API pública no admite filtros ni paginación: se muestran los destinos recibidos. El detalle permite volver a Destinos o ver todas las experiencias, sin enviar su ID real al filtro de paquetes ficticios.
+
 ## Login y panel administrativo
 
 Abrir `/admin/login`, o usar **Acceso administrativo** en el pie del sitio público.
@@ -61,9 +67,15 @@ Servicios utiliza la API real `/api/admin/servicios` y requiere `ADMIN`, tambié
 
 La búsqueda y el estado de Servicios se filtran en el servidor. La API entrega un arreglo sin paginación: el orden por nombre y las páginas de seis filas se resuelven localmente. Los filtros, el orden y la página se conservan en la URL. Después de guardar se vuelve a consultar el listado y se ajusta la página si es necesario. El interceptor reutiliza el JWT y la renovación de sesión existentes.
 
-Paquetes, Destinos y Proveedores conservan las tablas de prueba con búsqueda, filtros, orden, paginación, formularios y validaciones. Paquetes y destinos comparten datos de prueba con el catálogo público. Los servicios ficticios vinculados a proveedores permanecen aislados en el mock: no representan los servicios de la API, que todavía no admite proveedor, tipo ni tarifa. El operador no puede acceder a Usuarios ni Servicios ni modificar registros.
+Destinos utiliza `/api/admin/destinos` y requiere `ADMIN` para listar, consultar, crear, editar y activar o desactivar. Su formulario comparte creación y edición: nombre (máximo 100), ubicación (máximo 150), subtítulo (máximo 100) y descripción son obligatorios; URL de imagen es opcional (máximo 500). No se aceptan campos obligatorios con solo espacios. El backend crea el destino activo y comprueba la unicidad de nombre y ubicación, también entre inactivos. La imagen se registra como texto, sin subida de archivos; dejarla vacía la elimina y se muestra una alternativa cuando falta o no carga.
 
-Los registros de prueba se mantienen en memoria al navegar y se restablecen al recargar. Los cambios de Usuarios y Servicios se guardan en el backend. El JWT de acceso se conserva solo en memoria y el backend gestiona la cookie de renovación HttpOnly. Al recargar se intenta recuperar la sesión mediante `/api/auth/refresh`. No se guardan contraseñas ni JWT en localStorage o sessionStorage.
+Destinos conserva el patrón de Servicios: filtros por nombre y estado en servidor, orden y páginas locales de seis filas, parámetros en la URL y recarga después de guardar. Crear y editar envían únicamente los cinco campos del formulario; el estado se cambia por separado con `PATCH /api/admin/destinos/{id}/estado` y `{ estado }`. El modal consulta el detalle actualizado antes de editar, conserva los datos ante errores y confirma el descarte de cambios pendientes. No se muestran tarjetas de cantidades ni un conteo de paquetes basado en mocks.
+
+Paquetes y Proveedores conservan las tablas de prueba. Los paquetes destacados del inicio, el buscador, los filtros del catálogo de paquetes y las opciones del editor de Paquetes siguen usando `CatalogoMockStore`. Esos destinos ficticios no se mezclan con los IDs numéricos del backend. Los cambios administrativos de Destinos se reflejan al abrir o reconsultar el catálogo público real, sin alterar los paquetes mock ni sus comprobaciones. Conectar los paquetes con los destinos reales queda pendiente de su contrato API.
+
+Los servicios ficticios vinculados a proveedores permanecen aislados en el mock: no representan los servicios de la API, que todavía no admite proveedor, tipo ni tarifa. El operador no puede acceder a Usuarios, Servicios ni Destinos ni modificar registros.
+
+Los registros de prueba se mantienen en memoria al navegar y se restablecen al recargar. Los cambios de Usuarios, Servicios y Destinos administrativos se guardan en el backend. El JWT de acceso se conserva solo en memoria y el backend gestiona la cookie de renovación HttpOnly. Al recargar se intenta recuperar la sesión mediante `/api/auth/refresh`. No se guardan contraseñas ni JWT en localStorage o sessionStorage.
 
 Para desarrollo, `npm start` usa `proxy.conf.json` para enviar `/api/**` a `http://localhost:8085`, conservando el mismo origen para cookies y CSRF. Reinicia el servidor Angular si ya estaba iniciado antes de añadir el proxy. El backend debe permitir cookies en el entorno local HTTP (`AUTH_COOKIE_SECURE=false` según su documentación). En producción se necesita HTTPS y un proxy equivalente para `/api`.
 

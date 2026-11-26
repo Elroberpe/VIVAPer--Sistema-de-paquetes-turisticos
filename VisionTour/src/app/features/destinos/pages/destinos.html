@@ -1,5 +1,39 @@
-<section class="page-container section-space">
-  <nav class="breadcrumb-nav" aria-label="Ruta de navegación"><a routerLink="/">Inicio</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span aria-current="page">Destinos</span></nav>
-  <span class="eyebrow">UN PAÍS QUE NO DEJA DE SORPRENDER</span><h1 class="page-heading">No es un destino.<br>Es cómo te hace sentir.</h1><p class="page-description">La calma del río, la emoción de las dunas o ese silencio entre montañas. Encuentra tu forma de vivir el Perú.</p>
-  <div class="row g-4 destinations-list">@if (!destinos()) { <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Descubriendo destinos…</div> } @else { @for (destino of destinos(); track destino.id) { <div class="col-md-6"><article class="destination-feature"><a routerLink="/paquetes" [queryParams]="{ destino: destino.id }" tabindex="-1" aria-hidden="true"><img [src]="destino.imagen" alt="" width="800" height="500" loading="lazy"></a><div class="destination-body"><span class="eyebrow">{{ destino.region }}</span><h2>{{ destino.nombre }}</h2><p>{{ destino.descripcion }}</p><a class="text-link" routerLink="/paquetes" [queryParams]="{ destino: destino.id }">Explorar {{ destino.nombre }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></article></div> } }</div>
+<section class="destinations-page">
+  <header class="destinations-banner" aria-labelledby="destinos-titulo">
+    <img class="destinations-banner-image" src="/images/cusco.jpg" alt="" width="1600" height="800" fetchpriority="high">
+    <div class="page-container destinations-banner-content">
+      <nav class="breadcrumb-nav" aria-label="Ruta de navegación"><a routerLink="/">Inicio</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span aria-current="page">Destinos</span></nav>
+      <h1 class="page-heading" id="destinos-titulo">Descubre destinos increíbles</h1>
+      <p class="page-description">Explora los mejores lugares turísticos del Perú con VivaPeru</p>
+      <div class="destinations-search" role="search" aria-label="Buscar destinos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <label class="visually-hidden" for="buscar-destino-publico">Buscar destino</label>
+        <input id="buscar-destino-publico" type="search" placeholder="Buscar destino (ej. Cusco, playa, naturaleza...)" disabled>
+        <button class="btn btn-primary" type="button" disabled>Buscar</button>
+      </div>
+    </div>
+  </header>
+  <div class="page-container destinations-content">
+    <div class="row g-4 destinations-list" [attr.aria-busy]="estado().cargando">
+      @if (estado().cargando) {
+        <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Descubriendo destinos…</div>
+      } @else if (estado().error) {
+        <div class="col-12 empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h2>No pudimos cargar los destinos.</h2><p>{{ estado().error }}</p><button class="btn btn-outline-brand" type="button" (click)="reintentar()">Volver a intentar</button></div>
+      } @else if (!estado().destinos.length) {
+        <div class="col-12 empty-state"><i class="bi bi-geo-alt" aria-hidden="true"></i><h2>Pronto habrá nuevos destinos.</h2><p>Vuelve a visitarnos para descubrir más lugares del Perú.</p><a class="btn btn-outline-brand" routerLink="/">Volver al inicio</a></div>
+      } @else {
+        @for (destino of estado().destinos; track destino.idDestino) {
+          <div class="col-md-6 col-lg-4"><article class="destination-feature">
+            <a [routerLink]="['/destinos', destino.idDestino]" tabindex="-1" aria-hidden="true"><vp-destino-imagen [url]="destino.imagenUrl" [nombre]="destino.nombre" /></a>
+            <div class="destination-body">
+              <h2>{{ destino.nombre }}</h2>
+              <p class="destination-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i><span>{{ destino.ubicacion }}</span></p>
+              <p class="destination-subtitle">{{ destino.subtitulo }}</p>
+              <a class="btn btn-primary destination-link" [routerLink]="['/destinos', destino.idDestino]" [attr.aria-label]="'Ver detalles de ' + destino.nombre">Ver detalles <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article></div>
+        }
+      }
+    </div>
+  </div>
 </section>

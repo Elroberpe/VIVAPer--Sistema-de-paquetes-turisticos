@@ -1,0 +1,14 @@
+<section class="page-container section-space" [attr.aria-busy]="estado().cargando">
+  <nav class="breadcrumb-nav" aria-label="Ruta de navegación"><a routerLink="/">Inicio</a><i class="bi bi-chevron-right" aria-hidden="true"></i><a routerLink="/destinos">Destinos</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span aria-current="page">{{ estado().destino?.nombre || 'Detalle' }}</span></nav>
+  @if (estado().cargando) {
+    <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Descubriendo el destino…</div>
+  } @else if (estado().noDisponible) {
+    <div class="empty-state"><i class="bi bi-geo-alt" aria-hidden="true"></i><h1 class="page-heading">Destino no disponible.</h1><p>Este destino no se encuentra disponible. Explora otros lugares del Perú.</p><a class="btn btn-primary" routerLink="/destinos">Volver a destinos</a></div>
+  } @else if (estado().error) {
+    <div class="empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h1 class="page-heading">No pudimos cargar el destino.</h1><p>{{ estado().error }}</p><button class="btn btn-primary" type="button" (click)="reintentar()">Volver a intentar</button><a class="text-link back-link" routerLink="/destinos">Volver a destinos</a></div>
+  } @else if (estado().destino; as destino) {
+    <header class="destination-heading"><span class="eyebrow"><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ destino.ubicacion }}</span><h1 class="page-heading">{{ destino.nombre }}</h1><p class="page-description">{{ destino.subtitulo }}</p></header>
+    <vp-destino-imagen class="destination-detail-image" [url]="destino.imagenUrl" [nombre]="destino.nombre" />
+    <div class="destination-content"><h2>Descubre {{ destino.nombre }}</h2><p class="destination-description">{{ destino.descripcion }}</p><div class="destination-links"><a class="btn btn-primary" routerLink="/paquetes">Ver todas las experiencias <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a><a class="text-link" routerLink="/destinos">Volver a destinos <i class="bi bi-arrow-left" aria-hidden="true"></i></a></div></div>
+  }
+</section>

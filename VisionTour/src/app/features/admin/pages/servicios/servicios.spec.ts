@@ -221,12 +221,12 @@ describe('Gestión de Servicios con la API', () => {
     editor.dialog().nativeElement.dispatchEvent(new Event('cancel', { cancelable: true }));
     await renderizar();
     expect(editor.dialog().nativeElement.open).toBe(true);
-    await harness.navigateByUrl('/admin/destinos');
+    await harness.navigateByUrl('/admin/proveedores');
     expect(TestBed.inject(Router).url).toBe('/admin/servicios');
     expect(editor.form.controls.nombre.value).toBe('Borrador');
     confirmar.mockResolvedValue(true);
-    await harness.navigateByUrl('/admin/destinos');
-    expect(TestBed.inject(Router).url).toBe('/admin/destinos');
+    await harness.navigateByUrl('/admin/proveedores');
+    expect(TestBed.inject(Router).url).toBe('/admin/proveedores');
   });
 
   it('confirma el estado, impide duplicados y corrige la última página tras desactivar', async () => {

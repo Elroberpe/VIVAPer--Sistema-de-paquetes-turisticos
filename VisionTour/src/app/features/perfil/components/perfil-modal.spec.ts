@@ -12,6 +12,7 @@ import { AuthRepository } from '../../auth/data-access/auth.repository';
 import { SesionAdmin } from '../../auth/models/sesion';
 import { PerfilUsuario } from '../models/perfil';
 import { PerfilModal } from './perfil-modal';
+import { DestinosRepository } from '../../destinos/data-access/destinos.repository';
 
 const usuario: PerfilUsuario = { id: 25, nombre: 'Ana', apellido: 'Prueba', usuario: 'ana.prueba', celular: '+51999888777', email: 'ana@example.test', rol: 'ADMIN' };
 
@@ -27,6 +28,7 @@ describe('Modal de perfil compartido entre administración y clientes', () => {
     cerrarSesion.mockReset().mockReturnValue(of(undefined));
     TestBed.configureTestingModule({ providers: [
       ...appConfig.providers, provideHttpClientTesting(),
+      { provide: DestinosRepository, useValue: { listarPublicos: () => of([]) } },
       { provide: AuthRepository, useValue: {
         iniciarSesion: () => of({ usuarioId: '25', nombre: 'Ana Prueba', correo: usuario.email, rol: 'Administrador', expiraEn: Date.now() + 900000 } satisfies SesionAdmin),
         obtenerAccessToken: () => 'jwt-de-prueba',
