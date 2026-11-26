@@ -13,6 +13,8 @@ import { AdminRepository } from './features/admin/data-access/admin.repository';
 import { AdminMockRepository } from './features/admin/data-access/admin-mock.repository';
 import { ServiciosRepository } from './features/admin/data-access/servicios.repository';
 import { ServiciosApiRepository } from './features/admin/data-access/servicios-api.repository';
+import { ProveedoresRepository } from './features/admin/data-access/proveedores.repository';
+import { ProveedoresApiRepository } from './features/admin/data-access/proveedores-api.repository';
 import { DestinosRepository } from './features/destinos/data-access/destinos.repository';
 import { DestinosApiRepository } from './features/destinos/data-access/destinos-api.repository';
 
@@ -25,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     { provide: AuthRepository, useClass: AuthApiRepository },
     { provide: AdminRepository, useClass: AdminMockRepository },
     { provide: ServiciosRepository, useClass: ServiciosApiRepository },
+    { provide: ProveedoresRepository, useClass: ProveedoresApiRepository },
     { provide: DestinosRepository, useClass: DestinosApiRepository },
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }))
   ]

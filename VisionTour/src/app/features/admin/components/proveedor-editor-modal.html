@@ -1,0 +1,77 @@
+<dialog #modal class="record-dialog" aria-labelledby="proveedor-editor-titulo" (cancel)="cerrar($event)">
+  <header class="dialog-header">
+    <div><span class="management-eyebrow">GESTIÓN DE PROVEEDORES</span><h2 id="proveedor-editor-titulo">{{ modo() === 'crear' ? 'Nuevo proveedor' : modo() === 'editar' ? 'Editar proveedor' : 'Detalle de proveedor' }}</h2></div>
+    <button class="dialog-close" type="button" aria-label="Cerrar proveedor" autofocus [disabled]="guardando() || cargandoServicios()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+  </header>
+  @if (cargando()) {
+    <div class="dialog-body loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando proveedor y servicios…</div>
+  } @else if (!cargaCompleta()) {
+    <div class="dialog-body"><div class="providers-error" role="alert">{{ error() }}</div><button class="btn btn-outline-brand" type="button" (click)="cargar()">Volver a intentar</button></div>
+  } @else if (modo() === 'detalle') {
+    <div class="dialog-body">
+      @if (proveedor(); as dato) {
+        <dl class="provider-details">
+          <div><dt>RUC</dt><dd>{{ dato.ruc }}</dd></div><div><dt>Nombre</dt><dd>{{ dato.nombre }}</dd></div>
+          <div><dt>Encargado</dt><dd>{{ dato.encargado }}</dd></div><div><dt>Correo</dt><dd>{{ dato.email || 'Sin correo' }}</dd></div>
+          <div><dt>Teléfono</dt><dd>{{ dato.telefono }}</dd></div><div><dt>Estado</dt><dd>{{ dato.estado ? 'Activo' : 'Inactivo' }}</dd></div>
+          <div class="field-wide"><dt>Servicios asociados</dt><dd>@if (dato.servicios.length) { <ul>@for (servicio of dato.servicios; track servicio.idServicio) { <li>{{ servicio.nombre }}</li> }</ul> } @else { Sin servicios asociados }</dd></div>
+        </dl>
+      }
+    </div>
+  } @else {
+    <form id="proveedor-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+      <div class="dialog-body">
+        <fieldset [disabled]="guardando() || cargandoServicios()">
+          <legend class="visually-hidden">Datos del proveedor</legend>
+          <div class="editor-fields">
+            <div>
+              <label class="form-label" for="proveedor-ruc">RUC <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="proveedor-ruc" formControlName="ruc" inputmode="numeric" maxlength="11" required [attr.aria-invalid]="(form.controls.ruc.touched && form.controls.ruc.invalid) || !!erroresCampos().ruc" aria-describedby="proveedor-ruc-error">
+              @if (erroresCampos().ruc || (form.controls.ruc.touched && form.controls.ruc.invalid)) { <p class="field-error" id="proveedor-ruc-error">{{ erroresCampos().ruc || 'Ingresa un RUC de exactamente 11 dígitos.' }}</p> }
+            </div>
+            <div>
+              <label class="form-label" for="proveedor-nombre">Nombre <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="proveedor-nombre" formControlName="nombre" maxlength="150" required [attr.aria-invalid]="(form.controls.nombre.touched && form.controls.nombre.invalid) || !!erroresCampos().nombre" aria-describedby="proveedor-nombre-error">
+              @if (erroresCampos().nombre || (form.controls.nombre.touched && form.controls.nombre.invalid)) { <p class="field-error" id="proveedor-nombre-error">{{ erroresCampos().nombre || 'Ingresa un nombre de hasta 150 caracteres.' }}</p> }
+            </div>
+            <div>
+              <label class="form-label" for="proveedor-encargado">Encargado <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="proveedor-encargado" formControlName="encargado" maxlength="150" required [attr.aria-invalid]="(form.controls.encargado.touched && form.controls.encargado.invalid) || !!erroresCampos().encargado" aria-describedby="proveedor-encargado-error">
+              @if (erroresCampos().encargado || (form.controls.encargado.touched && form.controls.encargado.invalid)) { <p class="field-error" id="proveedor-encargado-error">{{ erroresCampos().encargado || 'Ingresa un encargado de hasta 150 caracteres.' }}</p> }
+            </div>
+            <div>
+              <label class="form-label" for="proveedor-telefono">Teléfono <span aria-hidden="true">*</span></label>
+              <input class="form-control" id="proveedor-telefono" type="tel" formControlName="telefono" maxlength="20" required [attr.aria-invalid]="(form.controls.telefono.touched && form.controls.telefono.invalid) || !!erroresCampos().telefono" aria-describedby="proveedor-telefono-error">
+              @if (erroresCampos().telefono || (form.controls.telefono.touched && form.controls.telefono.invalid)) { <p class="field-error" id="proveedor-telefono-error">{{ erroresCampos().telefono || 'Ingresa un teléfono de hasta 20 caracteres.' }}</p> }
+            </div>
+            <div class="field-wide">
+              <label class="form-label" for="proveedor-email">Correo <span class="text-muted">(opcional)</span></label>
+              <input class="form-control" id="proveedor-email" type="email" formControlName="email" maxlength="150" [attr.aria-invalid]="(form.controls.email.touched && form.controls.email.invalid) || !!erroresCampos().email" aria-describedby="proveedor-email-error">
+              @if (erroresCampos().email || (form.controls.email.touched && form.controls.email.invalid)) { <p class="field-error" id="proveedor-email-error">{{ erroresCampos().email || 'Ingresa un correo válido de hasta 150 caracteres o déjalo vacío.' }}</p> }
+            </div>
+            <fieldset class="field-wide" aria-describedby="proveedor-servicios-ayuda proveedor-servicios-error">
+              <legend class="form-label">Servicios <span class="text-muted">(opcional)</span></legend>
+              <small class="field-help" id="proveedor-servicios-ayuda">Puedes agregar servicios activos. Los inactivos ya asociados pueden conservarse o retirarse; si los retiras y guardas, no podrás volver a agregarlos mientras sigan inactivos.</small>
+              <div class="service-options">
+                @for (servicio of opcionesServicios(); track servicio.idServicio) {
+                  <label class="service-option"><input type="checkbox" [checked]="seleccion().includes(servicio.idServicio)" [disabled]="!servicio.estado && !asociado(servicio.idServicio) && !seleccion().includes(servicio.idServicio)" (change)="seleccionar(servicio, $any($event.target).checked)"><span>{{ servicio.nombre }}@if (!servicio.estado) { <small>{{ asociado(servicio.idServicio) ? 'Inactivo · asociación existente' : 'Ya no está activo · retíralo para continuar' }}</small> }</span></label>
+                } @empty { <p class="field-help">No hay servicios activos disponibles. Puedes guardar el proveedor sin servicios.</p> }
+              </div>
+              @if (erroresCampos().serviciosIds) { <p class="field-error" id="proveedor-servicios-error">{{ erroresCampos().serviciosIds }}</p> }
+            </fieldset>
+          </div>
+        </fieldset>
+        @if (cargandoServicios()) { <p role="status">Actualizando servicios…</p> }
+        @if (errorServicios()) { <div class="providers-error" role="alert">{{ errorServicios() }} <button class="btn btn-outline-brand" type="button" (click)="actualizarServicios()">Volver a cargar servicios</button></div> }
+        @if (modo() === 'crear') { <p class="editor-note">El proveedor se creará activo.</p> }
+        @if (error()) { <div class="form-save-error" role="alert">{{ error() }}</div> }
+      </div>
+    </form>
+  }
+  <footer class="dialog-footer">
+    <button class="btn btn-outline-brand" type="button" [disabled]="guardando() || cargandoServicios()" (click)="cerrar()">{{ modo() === 'detalle' ? 'Cerrar' : 'Cancelar' }}</button>
+    @if (cargaCompleta() && !cargando() && modo() !== 'detalle') {
+      <button class="btn btn-primary" type="submit" form="proveedor-form" [disabled]="guardando() || cargandoServicios() || !!errorServicios()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { Guardar proveedor }</button>
+    }
+  </footer>
+</dialog>

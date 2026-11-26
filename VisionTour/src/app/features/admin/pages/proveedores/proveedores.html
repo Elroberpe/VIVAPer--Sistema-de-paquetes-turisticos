@@ -1,0 +1,65 @@
+<section aria-labelledby="gestion-titulo">
+  <div class="management-heading">
+    <div><span class="management-eyebrow">ALIADOS EN CADA DESTINO</span><h1 id="gestion-titulo">Proveedores</h1><p>Gestiona tus aliados locales y sus servicios.</p></div>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary create-button" type="button" [disabled]="cambiando() !== null" (click)="editor.abrir('crear')"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo proveedor</button>
+      <button class="btn btn-outline-brand" type="button" [disabled]="fuente().cargando || cambiando() !== null" (click)="recargar()"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar</button>
+    </div>
+  </div>
+  @if (mensaje()) { <div class="save-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}<button type="button" aria-label="Cerrar aviso" (click)="mensaje.set('')"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div> }
+  @if (errorAccion()) { <div class="providers-error" role="alert">{{ errorAccion() }}</div> }
+
+  <div class="records-card" [attr.aria-busy]="fuente().cargando">
+    <div class="records-heading"><div><h2>Listado de proveedores @if (!fuente().cargando && !fuente().error) { <span>{{ fuente().datos.totalElements }}</span> }</h2><p>Los cambios se guardan en el sistema.</p></div></div>
+    <div class="records-toolbar">
+      <div class="status-tabs" aria-label="Filtrar por estado">
+        <button type="button" [class.active]="estado() === undefined" [attr.aria-pressed]="estado() === undefined" (click)="filtrar('estado', '')">Todos</button>
+        <button type="button" [class.active]="estado() === 'activo'" [attr.aria-pressed]="estado() === 'activo'" (click)="filtrar('estado', 'Activo')">Activos</button>
+        <button type="button" [class.active]="estado() === 'inactivo'" [attr.aria-pressed]="estado() === 'inactivo'" (click)="filtrar('estado', 'Inactivo')">Inactivos</button>
+      </div>
+      <div class="search-and-filters">
+        <label class="table-search"><span class="visually-hidden">Buscar proveedor por nombre</span><i class="bi bi-search" aria-hidden="true"></i><input type="search" maxlength="150" placeholder="Buscar por nombre…" [formControl]="busqueda"></label>
+        <button class="filter-button" type="button" (click)="limpiar()">Limpiar</button>
+      </div>
+    </div>
+    @if (fuente().cargando) {
+      <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando proveedores…</div>
+    } @else if (fuente().error) {
+      <div class="empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h2>No pudimos cargar los proveedores.</h2><p>{{ fuente().error }}</p><button class="btn btn-outline-brand" type="button" (click)="recargar()">Volver a intentar</button></div>
+    } @else if (!fuente().datos.content.length) {
+      <div class="empty-state"><i class="bi bi-search" aria-hidden="true"></i><h2>No encontramos proveedores.</h2><p>Prueba otro nombre o limpia los filtros.</p><button class="btn btn-outline-brand" type="button" (click)="limpiar()">Limpiar filtros</button></div>
+    } @else {
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Tabla de proveedores">
+        <table class="management-table"><thead><tr><th scope="col">Proveedor</th><th scope="col">Correo</th><th scope="col">Teléfono</th><th scope="col">Estado</th><th scope="col" class="actions-heading">Acciones</th></tr></thead>
+          <tbody>@for (proveedor of fuente().datos.content; track proveedor.idProveedor) {
+            <tr>
+              <td><div class="record-primary"><span class="record-symbol"><i class="bi bi-buildings" aria-hidden="true"></i></span><div><strong>{{ proveedor.nombre }}</strong><small>{{ proveedor.encargado }}</small></div></div></td>
+              <td><span class="secondary-cell">{{ proveedor.email || 'Sin correo' }}</span></td>
+              <td><span class="secondary-cell">{{ proveedor.telefono }}</span></td>
+              <td><span class="state-tag" [class.is-active]="proveedor.estado"><span></span>{{ proveedor.estado ? 'Activo' : 'Inactivo' }}</span></td>
+              <td><div class="row-actions">
+                <button class="detail-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="'Ver proveedor: ' + proveedor.nombre" (click)="editor.abrir('detalle', proveedor.idProveedor)"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                <button class="edit-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="'Editar proveedor: ' + proveedor.nombre" (click)="editor.abrir('editar', proveedor.idProveedor)"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                <button class="state-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="(proveedor.estado ? 'Desactivar' : 'Activar') + ' proveedor: ' + proveedor.nombre" (click)="cambiarEstado(proveedor)">
+                  @if (cambiando() === proveedor.idProveedor) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> } @else { <i class="bi" [class.bi-toggle-on]="proveedor.estado" [class.bi-toggle-off]="!proveedor.estado" aria-hidden="true"></i> }
+                  {{ proveedor.estado ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div></td>
+            </tr>
+          }</tbody>
+        </table>
+      </div>
+    }
+    @if (!fuente().cargando && !fuente().error) {
+      <div class="table-footer"><span role="status">Mostrando <strong>{{ inicio() }}–{{ fin() }}</strong> de <strong>{{ fuente().datos.totalElements }}</strong> proveedores</span>
+        <nav class="pagination-controls" aria-label="Paginación de proveedores">
+          <button type="button" aria-label="Página anterior" [disabled]="fuente().datos.page === 0" (click)="irPagina(fuente().datos.page - 1)"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+          <span aria-current="page">{{ fuente().datos.totalPages ? fuente().datos.page + 1 : 0 }}</span><span class="page-total">de {{ fuente().datos.totalPages }}</span>
+          <button type="button" aria-label="Página siguiente" [disabled]="fuente().datos.page + 1 >= fuente().datos.totalPages" (click)="irPagina(fuente().datos.page + 1)"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+        </nav>
+      </div>
+    }
+  </div>
+</section>
+
+<vp-proveedor-editor-modal #editor (guardado)="proveedorGuardado()" />
