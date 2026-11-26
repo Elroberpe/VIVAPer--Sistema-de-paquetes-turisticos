@@ -1,0 +1,75 @@
+<section aria-labelledby="gestion-titulo">
+  <div class="management-heading">
+    <div><span class="management-eyebrow">LOS DETALLES HACEN EL VIAJE</span><h1 id="gestion-titulo">Servicios</h1><p>Consulta los servicios turísticos y administra su nombre, descripción y estado.</p></div>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary create-button" type="button" [disabled]="cambiando() !== null" (click)="editor.abrir('crear')"><i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo servicio</button>
+      <button class="btn btn-outline-brand" type="button" [disabled]="fuente().cargando" (click)="recargar()"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar</button>
+    </div>
+  </div>
+  <div class="stats-grid">
+    @for (stat of estadisticas(); track stat.etiqueta) {
+      <article class="stat-card"><div class="stat-top"><span>{{ stat.etiqueta }}</span><span [class]="'stat-icon ' + stat.clase"><i [class]="'bi ' + stat.icono" aria-hidden="true"></i></span></div><strong>{{ fuente().cargando || fuente().error ? '—' : stat.valor }}</strong><small>Según los filtros actuales</small></article>
+    }
+  </div>
+  @if (mensaje()) { <div class="save-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i>{{ mensaje() }}<button type="button" aria-label="Cerrar aviso" (click)="mensaje.set('')"><i class="bi bi-x-lg" aria-hidden="true"></i></button></div> }
+  @if (errorAccion()) { <div class="services-error" role="alert">{{ errorAccion() }}</div> }
+
+  <div class="records-card" [attr.aria-busy]="fuente().cargando">
+    <div class="records-heading"><div><h2>Listado de servicios @if (!fuente().cargando && !fuente().error) { <span>{{ fuente().registros.length }}</span> }</h2><p>Los cambios se guardan en el sistema.</p></div></div>
+    <div class="records-toolbar">
+      <div class="status-tabs" aria-label="Filtrar por estado">
+        <button type="button" [class.active]="estado() === undefined" [attr.aria-pressed]="estado() === undefined" (click)="filtrar('estado', '')">Todos</button>
+        <button type="button" [class.active]="estado() === true" [attr.aria-pressed]="estado() === true" (click)="filtrar('estado', 'Activo')">Activos</button>
+        <button type="button" [class.active]="estado() === false" [attr.aria-pressed]="estado() === false" (click)="filtrar('estado', 'Inactivo')">Inactivos</button>
+      </div>
+      <div class="search-and-filters">
+        <label class="table-search"><span class="visually-hidden">Buscar servicio por nombre</span><i class="bi bi-search" aria-hidden="true"></i><input type="search" placeholder="Buscar por nombre…" [formControl]="busqueda"></label>
+        <button class="filter-button" type="button" [attr.aria-expanded]="filtrosAbiertos()" aria-controls="filtros-servicios" (click)="filtrosAbiertos.set(!filtrosAbiertos())"><i class="bi bi-sliders2" aria-hidden="true"></i> Filtros</button>
+      </div>
+    </div>
+    @if (filtrosAbiertos()) {
+      <div class="extra-filters" id="filtros-servicios">
+        <div><label class="form-label" for="servicios-orden">Orden de la lista</label><select class="form-select" id="servicios-orden" [value]="parametros().get('orden') || ''" (change)="filtrar('orden', $any($event.target).value)"><option value="">ID: menor a mayor</option><option value="asc">Nombre: A a Z</option><option value="desc">Nombre: Z a A</option></select></div>
+        <button class="reset-filters" type="button" (click)="limpiar()">Limpiar filtros</button>
+      </div>
+    }
+
+    @if (fuente().cargando) {
+      <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando servicios…</div>
+    } @else if (fuente().error) {
+      <div class="empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h2>No pudimos cargar los servicios.</h2><p>{{ fuente().error }}</p><button class="btn btn-outline-brand" type="button" (click)="recargar()">Volver a intentar</button></div>
+    } @else if (!fuente().registros.length) {
+      <div class="empty-state"><i class="bi bi-search" aria-hidden="true"></i><h2>No encontramos servicios.</h2><p>Prueba otro nombre o limpia los filtros.</p><button class="btn btn-outline-brand" type="button" (click)="limpiar()">Limpiar filtros</button></div>
+    } @else {
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Tabla de servicios">
+        <table class="management-table"><thead><tr><th scope="col">ID</th><th scope="col">Servicio</th><th scope="col">Descripción</th><th scope="col">Estado</th><th scope="col" class="actions-heading">Acciones</th></tr></thead>
+          <tbody>@for (servicio of visibles(); track servicio.idServicio) {
+            <tr>
+              <td>{{ servicio.idServicio }}</td>
+              <td><div class="record-primary"><span class="record-symbol"><i class="bi bi-grid" aria-hidden="true"></i></span><strong>{{ servicio.nombre }}</strong></div></td>
+              <td><span class="secondary-cell service-description">{{ servicio.descripcion || 'Sin descripción' }}</span></td>
+              <td><span class="state-tag" [class.is-active]="servicio.estado"><span></span>{{ servicio.estado ? 'Activo' : 'Inactivo' }}</span></td>
+              <td><div class="row-actions">
+                <button class="detail-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="'Ver servicio: ' + servicio.nombre" (click)="editor.abrir('detalle', servicio.idServicio)"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                <button class="edit-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="'Editar servicio: ' + servicio.nombre" (click)="editor.abrir('editar', servicio.idServicio)"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
+                <button class="state-action" type="button" [disabled]="cambiando() !== null" [attr.aria-label]="(servicio.estado ? 'Desactivar' : 'Activar') + ' servicio: ' + servicio.nombre" (click)="cambiarEstado(servicio)">
+                  @if (cambiando() === servicio.idServicio) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> } @else { <i class="bi" [class.bi-toggle-on]="servicio.estado" [class.bi-toggle-off]="!servicio.estado" aria-hidden="true"></i> }
+                  {{ servicio.estado ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div></td>
+            </tr>
+          }</tbody>
+        </table>
+      </div>
+    }
+    @if (!fuente().cargando && !fuente().error) {
+      <div class="table-footer"><span role="status">Mostrando <strong>{{ inicio() }}–{{ fin() }}</strong> de <strong>{{ fuente().registros.length }}</strong> servicios</span>
+        <nav class="pagination-controls" aria-label="Paginación de servicios">
+          <button type="button" aria-label="Página anterior" [disabled]="pagina() <= 1" (click)="irPagina(pagina() - 1)"><i class="bi bi-chevron-left" aria-hidden="true"></i></button><span aria-current="page">{{ pagina() }}</span><span class="page-total">de {{ paginas() }}</span><button type="button" aria-label="Página siguiente" [disabled]="pagina() >= paginas()" (click)="irPagina(pagina() + 1)"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+        </nav>
+      </div>
+    }
+  </div>
+</section>
+
+<vp-servicio-editor-modal #editor (guardado)="servicioGuardado()" (noDisponible)="recargar()" />
