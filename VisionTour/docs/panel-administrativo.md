@@ -4,7 +4,7 @@ Estado: panel con datos de prueba y autenticación conectada a backend de VivaPe
 
 Servicios está conectado al backend y requiere ADMIN para todas sus operaciones. La pantalla maneja únicamente nombre, descripción opcional y estado; permite consultar, crear, editar y activar o desactivar. El listado se filtra en servidor por nombre y estado; orden y paginación se resuelven sobre el arreglo recibido. Usuarios, Servicios y Destinos administrativos guardan en el backend; Paquetes y Proveedores mantienen datos de prueba. Las referencias a servicios con proveedor o tarifa de este documento describen únicamente el mock histórico, que sigue aislado de la API real.
 
-Destinos requiere ADMIN y consume `/api/admin/destinos`: nombre, ubicación, subtítulo y descripción son obligatorios; imagen es una URL opcional. Crear y editar comparten formulario; el servidor asigna el ID numérico y el estado activo inicial. Activación y desactivación son acciones independientes con confirmación. La búsqueda y el estado se filtran en servidor; orden y páginas de seis filas se resuelven localmente y se conservan en la URL. No se muestran tarjetas de cantidades ni se mezclan los destinos reales con los del catálogo público mock.
+Destinos requiere ADMIN y consume `/api/admin/destinos`: nombre, ubicación, subtítulo y descripción son obligatorios; imagen es una URL opcional. Crear y editar comparten formulario; el servidor asigna el ID numérico y el estado activo inicial. Activación y desactivación son acciones independientes con confirmación. La búsqueda y el estado se filtran en servidor; orden y páginas de seis filas se resuelven localmente y se conservan en la URL. No se muestran tarjetas de cantidades. El inicio y el listado y detalle públicos consultan los mismos destinos activos mediante `/api/public/destinos`, sin autenticación.
 
 ## Menú vigente
 
@@ -94,10 +94,10 @@ Los componentes dependen de contratos de repositorio inyectados. Las implementac
 - `features/admin`: configuración de las cinco secciones, modelos, tablas, formularios y repositorio administrativo.
 - `features/admin/pages/servicios`: página específica; usa `ServiciosRepository` → `ServiciosApiRepository` y un único modal para crear, editar y consultar. Reutiliza estilos, alertas y sesión del panel. Los errores conservan el formulario y los cambios pendientes requieren confirmación de descarte al cerrar o navegar.
 - `features/admin/pages/destinos` y `features/admin/components/destino-editor-modal`: listado y formulario administrativo; reutilizan estilos y servicios del panel. El modelo y el contrato HTTP residen en `features/destinos`, junto al componente de imagen con alternativa visual. Se conservan los borradores ante errores y se confirma su descarte al cerrar o navegar.
-- `shared/catalogo`: modelos, fixtures y estado compartido por el sitio público y la gestión de paquetes y destinos.
+- `shared/catalogo`: modelos, fixtures y estado mock de paquetes, sus destinos de prueba, buscadores y editor administrativo de Paquetes.
 - `AdminMockStore`: usuarios, servicios y proveedores ficticios.
 
-El editor mock de Paquetes y el catálogo público siguen compartiendo `CatalogoMockStore`, incluidos sus destinos ficticios y opciones de selección. Recargar restablece esos registros iniciales. Los destinos de `/admin/destinos` se guardan en el backend y no actualizan esa fuente mock. La conexión del catálogo público a la API de Destinos queda para una siguiente etapa, cuando se defina la relación con los paquetes reales.
+El editor mock de Paquetes, los buscadores y el catálogo de experiencias siguen compartiendo `CatalogoMockStore`, incluidos sus destinos ficticios y opciones de selección. Recargar restablece esos registros iniciales. Los destinos de `/admin/destinos` se guardan en el backend y no actualizan esa fuente mock. El inicio y el catálogo público de Destinos consultan la API: un destino desactivado deja de aparecer al volver a consultar, y su detalle público responde 404. Sus tarjetas llevan a `/destinos/:idDestino`; el enlace a experiencias abre el catálogo general, sin mezclar IDs reales con los de los paquetes de prueba.
 
 ## Rutas
 
