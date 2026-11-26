@@ -1,7 +1,18 @@
 <section class="page-container destinations-page">
   <nav class="breadcrumb-nav" aria-label="Ruta de navegación"><a routerLink="/">Inicio</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span aria-current="page">Destinos</span></nav>
-  <h1 class="page-heading">Descubre destinos increíbles</h1>
-  <p class="page-description">Explora los mejores lugares turísticos del Perú con VivaPeru</p>
+  <header class="destinations-banner" aria-labelledby="destinos-titulo">
+    <img class="destinations-banner-image" src="/images/cusco.jpg" alt="" width="1600" height="800" fetchpriority="high">
+    <div class="destinations-banner-content">
+      <h1 class="page-heading" id="destinos-titulo">Descubre destinos increíbles</h1>
+      <p class="page-description">Explora los mejores lugares turísticos del Perú con VivaPeru</p>
+      <div class="destinations-search" role="search" aria-label="Buscar destinos">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <label class="visually-hidden" for="buscar-destino-publico">Buscar destino</label>
+        <input id="buscar-destino-publico" type="search" placeholder="Buscar destino (ej. Cusco, playa, naturaleza...)" disabled>
+        <button class="btn btn-primary" type="button" disabled>Buscar</button>
+      </div>
+    </div>
+  </header>
   <div class="row g-4 destinations-list" [attr.aria-busy]="estado().cargando">
     @if (estado().cargando) {
       <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Descubriendo destinos…</div>
