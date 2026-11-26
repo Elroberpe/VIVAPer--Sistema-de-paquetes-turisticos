@@ -6,6 +6,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.visiontour.usuario.exception.DatosUsuarioDuplicadosException;
+import com.visiontour.proveedor.exception.ConflictoProveedorException;
+import com.visiontour.proveedor.exception.DatosProveedorInvalidosException;
+import com.visiontour.proveedor.exception.ProveedorRecursoNoEncontradoException;
 import com.visiontour.usuario.exception.PasswordActualIncorrectaException;
 import com.visiontour.usuario.exception.PasswordReutilizadaException;
 import com.visiontour.usuario.exception.RolNoValidoException;
@@ -113,6 +116,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 || exception instanceof PasswordReutilizadaException
                 || exception instanceof DatosUsuarioDuplicadosException
                 || exception instanceof RolNoValidoException
+                || exception instanceof ConflictoProveedorException
+                || exception instanceof DatosProveedorInvalidosException
+                || exception instanceof ProveedorRecursoNoEncontradoException
                 || exception instanceof UltimoAdministradorActivoException) {
             return exception.getMessage();
         }
@@ -121,6 +127,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             String detalle = integrityException.getMostSpecificCause().getMessage();
             if (detalle != null) {
                 String constraint = detalle.toLowerCase(Locale.ROOT);
+                if (constraint.contains("uq_proveedores_ruc")) return "Ya existe un proveedor con ese RUC.";
                 if (constraint.contains("uk_usuarios_email")) return "Este correo ya está registrado.";
                 if (constraint.contains("uk_usuarios_usuario")) return "Este nombre de usuario ya está registrado.";
             }
