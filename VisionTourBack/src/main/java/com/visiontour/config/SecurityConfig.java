@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(errorHandler)
                         .accessDeniedHandler(errorHandler))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/admin/proveedores", "/api/admin/proveedores/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/registro", "/api/auth/login",
                                 "/api/auth/refresh", "/api/auth/logout").permitAll()
