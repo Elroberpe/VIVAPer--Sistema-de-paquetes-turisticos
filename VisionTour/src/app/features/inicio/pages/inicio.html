@@ -4,7 +4,7 @@
     <div class="hero-shade"></div>
     <div class="hero-content"><span class="hero-eyebrow"><span></span> GRANDES HISTORIAS, CERCA DE TI</span><h1 id="hero-title">Hay un Perú<br>que te espera.<span>Sal a descubrirlo.</span></h1><p>De los Andes al Amazonas, encuentra experiencias<br class="desktop-break"> que se convierten en tus mejores recuerdos.</p><a routerLink="/paquetes" class="hero-link">Encuentra tu próxima aventura <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div>
     <div class="hero-location"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Machu Picchu<small>Cusco, Perú</small></span></div>
-    <span class="hero-index">01 <span>/ 04 destinos</span></span>
+    <span class="hero-index">DESCUBRE EL PERÚ</span>
   </section>
   <div class="hero-search"><vp-buscador /></div>
   <div class="intro-benefits"><span><i class="bi bi-map" aria-hidden="true"></i> Itinerarios para inspirarte</span><span><i class="bi bi-heart" aria-hidden="true"></i> Viajes a tu manera</span><span><i class="bi bi-compass" aria-hidden="true"></i> Un país, mil formas de vivirlo</span><span class="preview-label"><span></span> Exploración de prueba</span></div>
@@ -12,7 +12,17 @@
 
 <section class="page-container section-space" aria-labelledby="destinos-title">
   <div class="section-heading"><div><span class="eyebrow">ELIGE DÓNDE EMPIEZA TU HISTORIA</span><h2 id="destinos-title">Un destino para cada emoción.</h2><p>Montañas, desiertos, ciudades y selva. ¿Por dónde empezamos?</p></div><a class="text-link" routerLink="/destinos">Ver destinos <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
-  <div class="destination-grid">@for (destino of destinos(); track destino.id) { <a class="destination-card" routerLink="/paquetes" [queryParams]="{ destino: destino.id }"><img [src]="destino.imagen" [alt]="'Paisaje de ' + destino.nombre" width="500" height="400" loading="lazy"><div class="destination-shade"></div><div class="destination-copy"><span>{{ destino.region }}</span><h3>{{ destino.nombre }}</h3></div><span class="destination-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a> }</div>
+  @if (estadoDestinos().cargando) {
+    <div class="loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Descubriendo destinos…</div>
+  } @else if (estadoDestinos().error) {
+    <div class="empty-state" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><h3>No pudimos cargar los destinos.</h3><p>{{ estadoDestinos().error }}</p><button class="btn btn-outline-brand" type="button" (click)="reintentarDestinos()">Volver a intentar</button></div>
+  } @else if (!estadoDestinos().destinos.length) {
+    <div class="empty-state"><i class="bi bi-geo-alt" aria-hidden="true"></i><h3>Pronto habrá nuevos destinos.</h3><p>Vuelve a visitarnos para descubrir más lugares del Perú.</p></div>
+  } @else {
+    <div class="destination-grid">@for (destino of estadoDestinos().destinos; track destino.idDestino) {
+      <a class="destination-card" [routerLink]="['/destinos', destino.idDestino]"><vp-destino-imagen [url]="destino.imagenUrl" [nombre]="destino.nombre" /><div class="destination-shade"></div><div class="destination-copy"><span>{{ destino.subtitulo }}</span><h3>{{ destino.nombre }}</h3></div><span class="destination-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a>
+    }</div>
+  }
 </section>
 
 <section class="experiences-section" aria-labelledby="experiencias-title"><div class="page-container">

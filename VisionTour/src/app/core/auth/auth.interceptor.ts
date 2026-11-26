@@ -6,8 +6,13 @@ import { AuthRepository } from '../../features/auth/data-access/auth.repository'
 import { AuthSessionService, destinoAdminSeguro } from './auth-session.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  // Nunca se envía el JWT a servicios externos ni a las rutas de cookies de auth.
+  // Nunca se envía el JWT a servicios externos ni a consultas públicas de destinos.
   if (!request.url.startsWith('/api/')) return next(request);
+  const ruta = request.url.split(/[?#]/)[0];
+  if (ruta === '/api/public/destinos' || ruta.startsWith('/api/public/destinos/')) {
+    return next(request.clone({ headers: request.headers.delete('Authorization') }));
+  }
+  // Las rutas de autenticación utilizan cookies y su flujo de CSRF existente.
   if (request.url.startsWith('/api/auth/')) return next(request.clone({ headers: request.headers.delete('Authorization') }));
   const repo = inject(AuthRepository);
   const auth = inject(AuthSessionService);

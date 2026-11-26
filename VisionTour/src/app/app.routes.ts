@@ -19,6 +19,7 @@ export const routes: Routes = [
     { path: 'paquetes', title: 'Explora experiencias · VivaPeru', loadComponent: () => import('./features/paquetes/pages/catalogo').then(m => m.Catalogo) },
     { path: 'paquetes/:slug', title: 'Tu próxima experiencia · VivaPeru', loadComponent: () => import('./features/paquetes/pages/detalle').then(m => m.Detalle) },
     { path: 'destinos', title: 'Destinos del Perú · VivaPeru', loadComponent: () => import('./features/destinos/pages/destinos').then(m => m.Destinos) },
+    { path: 'destinos/:idDestino', title: 'Descubre el destino · VivaPeru', loadComponent: () => import('./features/destinos/pages/detalle-destino').then(m => m.DetalleDestino) },
     { path: '**', title: 'Página no encontrada · VivaPeru', loadComponent: () => import('./shared/ui/not-found').then(m => m.NotFound) }
   ] }
 ];

@@ -7,6 +7,11 @@ import { DestinosRepository } from './destinos.repository';
 export class DestinosApiRepository extends DestinosRepository {
   private readonly http = inject(HttpClient);
   private readonly url = '/api/admin/destinos';
+  private readonly urlPublica = '/api/public/destinos';
+
+  override listarPublicos() { return this.http.get<Destino[]>(this.urlPublica); }
+
+  override detallePublico(id: number) { return this.http.get<Destino>(`${this.urlPublica}/${id}`); }
 
   override listar(filtros: DestinoFiltros = {}) {
     let params = new HttpParams();

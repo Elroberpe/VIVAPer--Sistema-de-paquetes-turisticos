@@ -1,0 +1,8 @@
+.destination-heading { margin-bottom: 2rem; overflow-wrap: anywhere; }
+.destination-detail-image { width: 100%; height: clamp(240px, 45vw, 480px); border-radius: var(--radius-card); }
+.destination-content { max-width: 800px; margin-top: 2rem; }
+.destination-content h2 { font-size: 26px; font-weight: 700; margin-bottom: 1rem; }
+.destination-description { white-space: pre-line; overflow-wrap: anywhere; font-size: 14px; color: var(--color-text-muted); line-height: 1.9; }
+.destination-links { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 2rem; }
+.back-link { margin-left: 1.5rem; }
+@media (width < 600px) { .destination-links { align-items: flex-start; flex-direction: column; } .back-link { display: block; margin: 1.5rem 0 0; } }

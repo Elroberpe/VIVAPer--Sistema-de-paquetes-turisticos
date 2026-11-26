@@ -1,6 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestinoDatos } from '../models/destino';
 
+export function mensajeDestinosPublicos(error: unknown): string {
+  if (error instanceof HttpErrorResponse && error.status === 0) return 'No pudimos conectar con el servidor. Inténtalo de nuevo.';
+  return 'No pudimos consultar los destinos. Inténtalo de nuevo en unos momentos.';
+}
+
 export function mensajeDestinos(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
     switch (error.status) {
