@@ -43,5 +43,8 @@ describe('Navegación administrativa', () => {
     await harness.navigateByUrl('/admin/servicios');
     expect(harness.routeNativeElement?.textContent).toContain('Esta sección requiere otro permiso.');
     TestBed.inject(HttpTestingController).expectNone(request => request.url === '/api/admin/servicios');
+    await harness.navigateByUrl('/admin/destinos');
+    expect(harness.routeNativeElement?.textContent).toContain('Esta sección requiere otro permiso.');
+    TestBed.inject(HttpTestingController).expectNone(request => request.url === '/api/admin/destinos');
   });
 });
