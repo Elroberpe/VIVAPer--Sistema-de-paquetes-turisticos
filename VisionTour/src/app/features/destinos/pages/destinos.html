@@ -10,13 +10,13 @@
       <div class="col-12 empty-state"><i class="bi bi-geo-alt" aria-hidden="true"></i><h2>Pronto habrá nuevos destinos.</h2><p>Vuelve a visitarnos para descubrir más lugares del Perú.</p><a class="btn btn-outline-brand" routerLink="/">Volver al inicio</a></div>
     } @else {
       @for (destino of estado().destinos; track destino.idDestino) {
-        <div class="col-md-6"><article class="destination-feature">
+        <div class="col-md-6 col-lg-4"><article class="destination-feature">
           <a [routerLink]="['/destinos', destino.idDestino]" tabindex="-1" aria-hidden="true"><vp-destino-imagen [url]="destino.imagenUrl" [nombre]="destino.nombre" /></a>
           <div class="destination-body">
             <h2>{{ destino.nombre }}</h2>
-            <span class="eyebrow">{{ destino.ubicacion }}</span>
+            <p class="destination-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i><span>{{ destino.ubicacion }}</span></p>
             <p class="destination-subtitle">{{ destino.subtitulo }}</p>
-            <a class="text-link" [routerLink]="['/destinos', destino.idDestino]">Explorar {{ destino.nombre }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+            <a class="btn destination-link" [routerLink]="['/destinos', destino.idDestino]" [attr.aria-label]="'Ver detalles de ' + destino.nombre">Ver detalles <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           </div>
         </article></div>
       }

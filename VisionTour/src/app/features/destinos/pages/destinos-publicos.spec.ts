@@ -57,7 +57,7 @@ describe('Destinos para visitantes', () => {
     expect(tarjeta.textContent).toContain(destino.ubicacion);
     expect(tarjeta.textContent).toContain(destino.subtitulo);
     expect(tarjeta.textContent).not.toContain('Conoce los paisajes del norte.');
-    expect(tarjeta.querySelector('a.text-link')?.getAttribute('href')).toBe('/destinos/37');
+    expect(tarjeta.querySelector('a.destination-link')?.getAttribute('href')).toBe('/destinos/37');
     expect(tarjeta.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe('Sin imagen de Destino real del norte');
     expect(contenido.querySelector('.admin-sidebar')).toBeNull();
     expect(contenido.querySelector('.customer-login')).not.toBeNull();
@@ -91,7 +91,7 @@ describe('Destinos para visitantes', () => {
 
   it('navega desde la tarjeta hasta el detalle público y conserva el layout de visitantes', async () => {
     await abrir(); await lista();
-    harness.routeNativeElement!.querySelector<HTMLAnchorElement>('.destination-feature a.text-link')!.click();
+    harness.routeNativeElement!.querySelector<HTMLAnchorElement>('.destination-feature a.destination-link')!.click();
     const request = await tomar(`${url}/37`);
     expect(request.request.headers.has('Authorization')).toBe(false);
     request.flush(destino); await renderizar();
