@@ -3,6 +3,13 @@
     <div><span class="management-eyebrow">GESTIÓN DE PROVEEDORES</span><h2 id="proveedor-editor-titulo">{{ modo() === 'crear' ? 'Nuevo proveedor' : modo() === 'editar' ? 'Editar proveedor' : 'Detalle de proveedor' }}</h2></div>
     <button class="dialog-close" type="button" aria-label="Cerrar proveedor" autofocus [disabled]="guardando() || cargandoServicios()" (click)="cerrar()"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
   </header>
+  @if (cargaCompleta() && modo() !== 'detalle') {
+    <div class="provider-tabs" role="tablist" aria-label="Secciones del proveedor" (keydown)="navegarPestanas($event)">
+      @for (pestana of pestanas; track pestana.id) {
+        <button [id]="'proveedor-tab-' + pestana.id" type="button" role="tab" [attr.aria-controls]="'proveedor-panel-' + pestana.id" [attr.aria-selected]="seccion() === pestana.id" [attr.tabindex]="seccion() === pestana.id ? 0 : -1" [disabled]="guardando() || cargando() || cargandoServicios()" (click)="cambiarSeccion(pestana.id)"><i [class]="'bi ' + pestana.icono" aria-hidden="true"></i>{{ pestana.titulo }}</button>
+      }
+    </div>
+  }
   @if (cargando()) {
     <div class="dialog-body loading-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Cargando proveedor y servicios…</div>
   } @else if (!cargaCompleta()) {
@@ -19,37 +26,41 @@
       }
     </div>
   } @else {
-    <form id="proveedor-form" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="guardando()">
+    <form id="proveedor-form" [formGroup]="form" (ngSubmit)="seccion() === 'datos' ? cambiarSeccion('servicios') : guardar()" novalidate [attr.aria-busy]="guardando()">
       <div class="dialog-body">
         <fieldset [disabled]="guardando() || cargandoServicios()">
           <legend class="visually-hidden">Datos del proveedor</legend>
-          <div class="editor-fields">
-            <div>
-              <label class="form-label" for="proveedor-ruc">RUC <span aria-hidden="true">*</span></label>
-              <input class="form-control" id="proveedor-ruc" formControlName="ruc" inputmode="numeric" maxlength="11" required [attr.aria-invalid]="(form.controls.ruc.touched && form.controls.ruc.invalid) || !!erroresCampos().ruc" aria-describedby="proveedor-ruc-error">
-              @if (erroresCampos().ruc || (form.controls.ruc.touched && form.controls.ruc.invalid)) { <p class="field-error" id="proveedor-ruc-error">{{ erroresCampos().ruc || 'Ingresa un RUC de exactamente 11 dígitos.' }}</p> }
+          <div class="provider-panel" id="proveedor-panel-datos" role="tabpanel" aria-labelledby="proveedor-tab-datos" [hidden]="seccion() !== 'datos'">
+            <div class="editor-fields">
+              <div>
+                <label class="form-label" for="proveedor-ruc">RUC <span aria-hidden="true">*</span></label>
+                <input class="form-control" id="proveedor-ruc" formControlName="ruc" inputmode="numeric" maxlength="11" required [attr.aria-invalid]="(form.controls.ruc.touched && form.controls.ruc.invalid) || !!erroresCampos().ruc" aria-describedby="proveedor-ruc-error">
+                @if (erroresCampos().ruc || (form.controls.ruc.touched && form.controls.ruc.invalid)) { <p class="field-error" id="proveedor-ruc-error">{{ erroresCampos().ruc || 'Ingresa un RUC de exactamente 11 dígitos.' }}</p> }
+              </div>
+              <div>
+                <label class="form-label" for="proveedor-nombre">Nombre <span aria-hidden="true">*</span></label>
+                <input class="form-control" id="proveedor-nombre" formControlName="nombre" maxlength="150" required [attr.aria-invalid]="(form.controls.nombre.touched && form.controls.nombre.invalid) || !!erroresCampos().nombre" aria-describedby="proveedor-nombre-error">
+                @if (erroresCampos().nombre || (form.controls.nombre.touched && form.controls.nombre.invalid)) { <p class="field-error" id="proveedor-nombre-error">{{ erroresCampos().nombre || 'Ingresa un nombre de hasta 150 caracteres.' }}</p> }
+              </div>
+              <div>
+                <label class="form-label" for="proveedor-encargado">Encargado <span aria-hidden="true">*</span></label>
+                <input class="form-control" id="proveedor-encargado" formControlName="encargado" maxlength="150" required [attr.aria-invalid]="(form.controls.encargado.touched && form.controls.encargado.invalid) || !!erroresCampos().encargado" aria-describedby="proveedor-encargado-error">
+                @if (erroresCampos().encargado || (form.controls.encargado.touched && form.controls.encargado.invalid)) { <p class="field-error" id="proveedor-encargado-error">{{ erroresCampos().encargado || 'Ingresa un encargado de hasta 150 caracteres.' }}</p> }
+              </div>
+              <div>
+                <label class="form-label" for="proveedor-telefono">Teléfono <span aria-hidden="true">*</span></label>
+                <input class="form-control" id="proveedor-telefono" type="tel" formControlName="telefono" maxlength="20" required [attr.aria-invalid]="(form.controls.telefono.touched && form.controls.telefono.invalid) || !!erroresCampos().telefono" aria-describedby="proveedor-telefono-error">
+                @if (erroresCampos().telefono || (form.controls.telefono.touched && form.controls.telefono.invalid)) { <p class="field-error" id="proveedor-telefono-error">{{ erroresCampos().telefono || 'Ingresa un teléfono de hasta 20 caracteres.' }}</p> }
+              </div>
+              <div class="field-wide">
+                <label class="form-label" for="proveedor-email">Correo <span class="text-muted">(opcional)</span></label>
+                <input class="form-control" id="proveedor-email" type="email" formControlName="email" maxlength="150" [attr.aria-invalid]="(form.controls.email.touched && form.controls.email.invalid) || !!erroresCampos().email" aria-describedby="proveedor-email-error">
+                @if (erroresCampos().email || (form.controls.email.touched && form.controls.email.invalid)) { <p class="field-error" id="proveedor-email-error">{{ erroresCampos().email || 'Ingresa un correo válido de hasta 150 caracteres o déjalo vacío.' }}</p> }
+              </div>
             </div>
-            <div>
-              <label class="form-label" for="proveedor-nombre">Nombre <span aria-hidden="true">*</span></label>
-              <input class="form-control" id="proveedor-nombre" formControlName="nombre" maxlength="150" required [attr.aria-invalid]="(form.controls.nombre.touched && form.controls.nombre.invalid) || !!erroresCampos().nombre" aria-describedby="proveedor-nombre-error">
-              @if (erroresCampos().nombre || (form.controls.nombre.touched && form.controls.nombre.invalid)) { <p class="field-error" id="proveedor-nombre-error">{{ erroresCampos().nombre || 'Ingresa un nombre de hasta 150 caracteres.' }}</p> }
-            </div>
-            <div>
-              <label class="form-label" for="proveedor-encargado">Encargado <span aria-hidden="true">*</span></label>
-              <input class="form-control" id="proveedor-encargado" formControlName="encargado" maxlength="150" required [attr.aria-invalid]="(form.controls.encargado.touched && form.controls.encargado.invalid) || !!erroresCampos().encargado" aria-describedby="proveedor-encargado-error">
-              @if (erroresCampos().encargado || (form.controls.encargado.touched && form.controls.encargado.invalid)) { <p class="field-error" id="proveedor-encargado-error">{{ erroresCampos().encargado || 'Ingresa un encargado de hasta 150 caracteres.' }}</p> }
-            </div>
-            <div>
-              <label class="form-label" for="proveedor-telefono">Teléfono <span aria-hidden="true">*</span></label>
-              <input class="form-control" id="proveedor-telefono" type="tel" formControlName="telefono" maxlength="20" required [attr.aria-invalid]="(form.controls.telefono.touched && form.controls.telefono.invalid) || !!erroresCampos().telefono" aria-describedby="proveedor-telefono-error">
-              @if (erroresCampos().telefono || (form.controls.telefono.touched && form.controls.telefono.invalid)) { <p class="field-error" id="proveedor-telefono-error">{{ erroresCampos().telefono || 'Ingresa un teléfono de hasta 20 caracteres.' }}</p> }
-            </div>
-            <div class="field-wide">
-              <label class="form-label" for="proveedor-email">Correo <span class="text-muted">(opcional)</span></label>
-              <input class="form-control" id="proveedor-email" type="email" formControlName="email" maxlength="150" [attr.aria-invalid]="(form.controls.email.touched && form.controls.email.invalid) || !!erroresCampos().email" aria-describedby="proveedor-email-error">
-              @if (erroresCampos().email || (form.controls.email.touched && form.controls.email.invalid)) { <p class="field-error" id="proveedor-email-error">{{ erroresCampos().email || 'Ingresa un correo válido de hasta 150 caracteres o déjalo vacío.' }}</p> }
-            </div>
-            <fieldset class="field-wide" aria-describedby="proveedor-servicios-ayuda proveedor-servicios-error">
+          </div>
+          <div class="provider-panel" id="proveedor-panel-servicios" role="tabpanel" aria-labelledby="proveedor-tab-servicios" [hidden]="seccion() !== 'servicios'">
+            <fieldset aria-describedby="proveedor-servicios-ayuda proveedor-servicios-error">
               <legend class="form-label">Servicios <span class="text-muted">(opcional)</span></legend>
               <small class="field-help" id="proveedor-servicios-ayuda">Puedes agregar servicios activos. Los inactivos ya asociados pueden conservarse o retirarse; si los retiras y guardas, no podrás volver a agregarlos mientras sigan inactivos.</small>
               <div class="service-options">
@@ -71,7 +82,12 @@
   <footer class="dialog-footer">
     <button class="btn btn-outline-brand" type="button" [disabled]="guardando() || cargandoServicios()" (click)="cerrar()">{{ modo() === 'detalle' ? 'Cerrar' : 'Cancelar' }}</button>
     @if (cargaCompleta() && !cargando() && modo() !== 'detalle') {
-      <button class="btn btn-primary" type="submit" form="proveedor-form" [disabled]="guardando() || cargandoServicios() || !!errorServicios()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { Guardar proveedor }</button>
+      @if (seccion() === 'datos') {
+        <button class="btn btn-primary" type="button" [disabled]="guardando() || cargandoServicios()" (click)="cambiarSeccion('servicios')">Siguiente <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+      } @else {
+        <button class="btn btn-outline-brand" type="button" [disabled]="guardando() || cargandoServicios()" (click)="cambiarSeccion('datos')"><i class="bi bi-arrow-left" aria-hidden="true"></i> Anterior</button>
+        <button class="btn btn-primary" type="submit" form="proveedor-form" [disabled]="guardando() || cargandoServicios() || !!errorServicios()">@if (guardando()) { <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando… } @else { {{ modo() === 'crear' ? 'Guardar proveedor' : 'Guardar cambios' }} }</button>
+      }
     }
   </footer>
 </dialog>

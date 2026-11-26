@@ -12,6 +12,8 @@ import { Proveedor, ProveedorDatos } from '../models/proveedor';
 import { Servicio } from '../models/servicio';
 
 type ModoEditor = 'crear' | 'editar' | 'detalle';
+type SeccionProveedor = 'datos' | 'servicios';
+const camposDatos = ['ruc', 'nombre', 'encargado', 'email', 'telefono'] as const;
 
 @Component({
   selector: 'vp-proveedor-editor-modal', imports: [ReactiveFormsModule], templateUrl: './proveedor-editor-modal.html',
@@ -30,6 +32,11 @@ export class ProveedorEditorModal {
   readonly guardado = output<Proveedor>();
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('modal');
   readonly modo = signal<ModoEditor>('crear');
+  readonly seccion = signal<SeccionProveedor>('datos');
+  readonly pestanas = [
+    { id: 'datos', titulo: 'Datos del proveedor', icono: 'bi-buildings' },
+    { id: 'servicios', titulo: 'Servicios', icono: 'bi-grid' }
+  ] as const;
   readonly proveedor = signal<Proveedor | null>(null);
   readonly servicios = signal<Servicio[]>([]);
   readonly seleccion = signal<number[]>([]);
@@ -54,6 +61,7 @@ export class ProveedorEditorModal {
     if (this.guardando() || this.cerrando || this.dialog().nativeElement.open || !this.auth.esAdministrador()) return;
     if (modo !== 'crear' && (!Number.isInteger(id) || id! <= 0)) return;
     this.id = id;
+    this.seccion.set('datos');
     this.modo.set(modo); this.proveedor.set(null); this.servicios.set([]); this.seleccion.set([]);
     this.form.reset(); this.error.set(''); this.erroresCampos.set({}); this.errorServicios.set(''); this.cargaCompleta.set(false);
     this.dialog().nativeElement.showModal();
@@ -77,6 +85,33 @@ export class ProveedorEditorModal {
 
   asociado(id: number) { return this.proveedor()?.servicios.some(s => s.idServicio === id) ?? false; }
 
+  cambiarSeccion(seccion: SeccionProveedor): boolean {
+    if (this.guardando() || this.cargando() || this.cargandoServicios() || !this.cargaCompleta() || this.cerrando || this.modo() === 'detalle') return false;
+    if (seccion === 'servicios' && !this.validarDatos()) return false;
+    this.seccion.set(seccion);
+    this.dialog().nativeElement.querySelector<HTMLButtonElement>(`#proveedor-tab-${seccion}`)?.focus();
+    return true;
+  }
+
+  navegarPestanas(event: KeyboardEvent) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const actual = this.pestanas.findIndex(p => p.id === this.seccion());
+    const indice = event.key === 'Home' ? 0 : event.key === 'End' ? this.pestanas.length - 1 : (actual + (event.key === 'ArrowRight' ? 1 : -1) + this.pestanas.length) % this.pestanas.length;
+    const seccion = this.pestanas[indice].id;
+    this.cambiarSeccion(seccion);
+  }
+
+  private validarDatos(): boolean {
+    this.form.controls.email.setValue(this.form.controls.email.value.trim());
+    if (camposDatos.some(campo => this.form.controls[campo].invalid)) {
+      for (const campo of camposDatos) this.form.controls[campo].markAsTouched();
+      this.seccion.set('datos');
+      return false;
+    }
+    return true;
+  }
+
   seleccionar(servicio: Servicio, seleccionado: boolean) {
     if (this.guardando() || this.cargandoServicios() || this.modo() === 'detalle') return;
     if (seleccionado && !servicio.estado && !this.asociado(servicio.idServicio)) return;
@@ -98,7 +133,7 @@ export class ProveedorEditorModal {
     if (this.modo() === 'editar' && !this.proveedor()) return;
     this.error.set(''); this.erroresCampos.set({});
     if (!this.auth.esAdministrador()) { this.error.set('No tienes permiso para gestionar proveedores.'); return; }
-    this.form.controls.email.setValue(this.form.controls.email.value.trim());
+    if (!this.validarDatos()) return;
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.guardando.set(true);
     try {
@@ -108,7 +143,11 @@ export class ProveedorEditorModal {
       const proveedor = await firstValueFrom(solicitud);
       this.cerrarSinConfirmar(); this.guardado.emit(proveedor);
     } catch (error) {
-      this.error.set(mensajeProveedores(error)); this.erroresCampos.set(erroresCamposProveedor(error));
+      this.error.set(mensajeProveedores(error));
+      const erroresCampos = erroresCamposProveedor(error);
+      this.erroresCampos.set(erroresCampos);
+      if (camposDatos.some(campo => erroresCampos[campo])) this.seccion.set('datos');
+      else if (erroresCampos.serviciosIds) this.seccion.set('servicios');
       if (error instanceof HttpErrorResponse && (error.status === 409 || error.status === 404)) await this.actualizarServicios();
     } finally { this.guardando.set(false); }
   }

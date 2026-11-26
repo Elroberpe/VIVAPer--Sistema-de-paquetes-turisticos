@@ -72,6 +72,84 @@ describe('Proveedores con la API', () => {
   }
   function completar() { editor.form.patchValue({ ruc: '20123456789', nombre: 'Nuevo proveedor', encargado: 'Luis', telefono: '+51 ext. 9' }); }
 
+  it('valida Datos antes de avanzar y conserva datos y servicios hasta el único POST final', async () => {
+    await abrir(); await lista(); editor.abrir('crear'); http.expectOne(r => r.url === serviciosUrl).flush([activo]); await renderizar();
+    const dialog = editor.dialog().nativeElement;
+    (dialog.querySelector('.dialog-footer .btn-primary') as HTMLButtonElement).click(); await renderizar();
+    expect(editor.seccion()).toBe('datos'); expect(editor.form.controls.ruc.touched).toBe(true);
+    expect(dialog.querySelector('[type="submit"]')).toBeNull();
+    http.expectNone(r => r.method === 'POST' || r.method === 'PUT');
+    completar();
+    (dialog.querySelector('#proveedor-tab-servicios') as HTMLButtonElement).click(); await renderizar();
+    expect(editor.seccion()).toBe('servicios');
+    expect((dialog.querySelector('#proveedor-panel-datos') as HTMLElement).hidden).toBe(true);
+    expect((dialog.querySelector('#proveedor-panel-servicios') as HTMLElement).hidden).toBe(false);
+    (dialog.querySelector('.service-option input') as HTMLInputElement).click();
+    (dialog.querySelector('#proveedor-tab-datos') as HTMLButtonElement).click(); await renderizar();
+    expect(editor.form.controls.nombre.value).toBe('Nuevo proveedor'); expect(editor.form.controls.serviciosIds.value).toEqual([1]);
+    (dialog.querySelector('.dialog-footer .btn-primary') as HTMLButtonElement).click(); await renderizar();
+    expect((dialog.querySelector('.service-option input') as HTMLInputElement).checked).toBe(true);
+    expect(document.activeElement?.id).toBe('proveedor-tab-servicios');
+    http.expectNone(r => r.method === 'POST' || r.method === 'PUT');
+    (dialog.querySelector('[type="submit"]') as HTMLButtonElement).click();
+    const request = http.expectOne(url); expect(request.request.method).toBe('POST');
+    expect(request.request.body.serviciosIds).toEqual([1]); expect(request.request.body.nombre).toBe('Nuevo proveedor');
+    request.flush(proveedor); (await tomar(url)).flush(pagina()); await renderizar(); expect(editor.dialog().nativeElement.open).toBe(false);
+  });
+
+  it('un envío del formulario desde Datos avanza a Servicios sin crear un proveedor', async () => {
+    await abrir(); await lista(); editor.abrir('crear'); http.expectOne(r => r.url === serviciosUrl).flush([]); completar(); await renderizar();
+    editor.dialog().nativeElement.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await renderizar(); expect(editor.seccion()).toBe('servicios');
+    http.expectNone(r => r.method === 'POST' || r.method === 'PUT');
+  });
+
+  it('navega con flechas, Home y End manteniendo foco y atributos accesibles', async () => {
+    await abrir(); await lista(); await editar();
+    const dialog = editor.dialog().nativeElement;
+    const datos = dialog.querySelector<HTMLButtonElement>('#proveedor-tab-datos')!;
+    const servicios = dialog.querySelector<HTMLButtonElement>('#proveedor-tab-servicios')!;
+    datos.focus(); datos.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })); await renderizar();
+    expect(editor.seccion()).toBe('servicios'); expect(document.activeElement).toBe(servicios);
+    expect(servicios.getAttribute('aria-selected')).toBe('true'); expect(datos.tabIndex).toBe(-1);
+    servicios.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true })); await renderizar();
+    expect(editor.seccion()).toBe('datos'); expect(document.activeElement).toBe(datos);
+    datos.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true })); await renderizar();
+    expect(editor.seccion()).toBe('servicios');
+    servicios.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })); await renderizar();
+    expect(editor.seccion()).toBe('datos'); http.expectNone(r => r.method !== 'GET');
+  });
+
+  it('edita con un solo PUT y bloquea las pestañas durante el guardado', async () => {
+    await abrir(); await lista(); await editar(); editor.form.controls.nombre.setValue('Nombre actualizado');
+    expect(editor.cambiarSeccion('servicios')).toBe(true); editor.seleccionar(activo, true); await renderizar();
+    const guardar = editor.guardar(); const request = http.expectOne(`${url}/15`); await renderizar();
+    expect(request.request.method).toBe('PUT'); expect(request.request.body.serviciosIds).toEqual([2, 1]);
+    expect(request.request.body.nombre).toBe('Nombre actualizado');
+    expect(editor.cambiarSeccion('datos')).toBe(false);
+    expect(Array.from(editor.dialog().nativeElement.querySelectorAll<HTMLButtonElement>('[role="tab"]')).every(tab => tab.disabled)).toBe(true);
+    request.flush(proveedor); await guardar; await lista();
+  });
+
+  it.each([
+    { campo: 'ruc', seccion: 'datos' },
+    { campo: 'serviciosIds[0]', seccion: 'servicios' }
+  ])('abre $seccion para errores de $campo sin perder el borrador', async ({ campo, seccion }) => {
+    await abrir(); await lista(); await editar(); editor.form.controls.nombre.setValue('Borrador'); editor.cambiarSeccion('servicios');
+    const guardar = editor.guardar(); http.expectOne(`${url}/15`).flush({ mensaje: 'Revisa los datos.', errores: { [campo]: 'Corrige este campo.' } }, { status: 400, statusText: 'Bad Request' });
+    await guardar; await renderizar(); expect(editor.seccion()).toBe(seccion);
+    expect(editor.form.controls.nombre.value).toBe('Borrador'); expect(editor.form.controls.serviciosIds.value).toEqual([2]);
+  });
+
+  it('confirma el descarte de ambas pestañas y reinicia en Datos al volver a abrir', async () => {
+    await abrir(); await lista(); await editar(); editor.cambiarSeccion('servicios'); editor.seleccionar(activo, true);
+    confirmar.mockResolvedValue(false); await editor.cerrar();
+    expect(editor.seccion()).toBe('servicios'); expect(editor.form.controls.serviciosIds.value).toEqual([2, 1]);
+    confirmar.mockResolvedValue(true); await editor.cerrar(); editor.abrir('crear');
+    http.expectOne(r => r.url === serviciosUrl).flush([activo]); await renderizar();
+    expect(editor.seccion()).toBe('datos'); expect(editor.form.controls.nombre.value).toBe(''); expect(editor.form.controls.serviciosIds.value).toEqual([]);
+  });
+
   it('lista datos reales con JWT y totales del servidor sin campos ni indicadores ficticios', async () => {
     await abrir(); const request = await lista(pagina({ totalElements: 25, totalPages: 3 }));
     expect(request.request.headers.get('Authorization')).toBe('Bearer jwt-admin');
