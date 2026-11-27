@@ -26,6 +26,7 @@ export class ServicioEditorModal {
   private consulta?: Subscription;
   private cerrando = false;
   readonly guardado = output<Servicio>();
+  readonly cerrado = output<void>();
   readonly noDisponible = output<void>();
   readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('modal');
   readonly modo = signal<ModoEditor>('crear');
@@ -116,5 +117,6 @@ export class ServicioEditorModal {
     this.cargando.set(false);
     this.error.set('');
     this.erroresCampos.set({});
+    this.cerrado.emit();
   }
 }

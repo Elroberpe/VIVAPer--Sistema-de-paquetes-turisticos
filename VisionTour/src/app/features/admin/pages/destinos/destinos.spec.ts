@@ -255,12 +255,12 @@ describe('Gestión de Destinos con la API', () => {
     editor.dialog().nativeElement.dispatchEvent(new Event('cancel', { cancelable: true }));
     await renderizar();
     expect(editor.dialog().nativeElement.open).toBe(true);
-    await harness.navigateByUrl('/admin/proveedores');
+    await harness.navigateByUrl('/admin/paquetes');
     expect(TestBed.inject(Router).url).toBe('/admin/destinos');
     expect(editor.form.controls.nombre.value).toBe('Borrador');
     confirmar.mockResolvedValue(true);
-    await harness.navigateByUrl('/admin/proveedores');
-    expect(TestBed.inject(Router).url).toBe('/admin/proveedores');
+    await harness.navigateByUrl('/admin/paquetes');
+    expect(TestBed.inject(Router).url).toBe('/admin/paquetes');
   });
 
   it('desactiva, bloquea envíos repetidos y corrige la última página filtrada', async () => {
